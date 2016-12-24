@@ -57,6 +57,7 @@ public class Scene
                 cubes[i, j] = newCube;
 
                 newCube.transform.parent = levelRootObject.transform;
+                newCube.UpdateShaderProperties();
             }
         }
         sceneBounds = new Bounds();
@@ -80,6 +81,16 @@ public class Scene
         Camera.main.transform.rotation = Quaternion.Euler(90, 180, 0);
 
         cameraPosition = Camera.main.transform.position;
+    }
+
+    public void ReadLevel(string path, bool isEditMode)
+    {
+
+    }
+
+    public void WriteLevel(string path)
+    {
+
     }
 
 }
