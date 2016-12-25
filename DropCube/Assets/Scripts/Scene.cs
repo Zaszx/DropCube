@@ -50,7 +50,7 @@ public class Scene
         {
             for(int j = 0; j < levelHeight; j++)
             {
-                Cube newCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
+                Cube newCube = GameObject.Instantiate(Prefabs.editCube).GetComponent<Cube>();
                 newCube.transform.position = new Vector3(i, 0, j);
                 newCube.transform.rotation = Quaternion.identity;
 

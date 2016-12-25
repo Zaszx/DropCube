@@ -15,14 +15,15 @@ public class EditCube : Cube
 	
 	public override void Update () 
     {
-
+        UpdateShaderProperties();
         base.Update();
 	}
 
-    public virtual void UpdateShaderProperties()
+    public override void UpdateShaderProperties()
     {
         Renderer thisRenderer = GetComponent<Renderer>();
-        thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
+
+        thisRenderer.material.SetVector(ShaderProperties.argumentId, new Vector4(highlighted ? 1 : 0, selected ? 1 : 0, 0, 0));
 
         base.UpdateShaderProperties();
     }

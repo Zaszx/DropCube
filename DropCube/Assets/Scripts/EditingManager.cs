@@ -110,6 +110,22 @@ public class EditingManager : MonoBehaviour
         scene.CreateNewLevel((int)widthSlider.value, (int)heightSlider.value);
 
         lastOpenedScenePath = "Assets/levels/newLevel.xml";
+        UpdateEditCubes();
+    }
+
+    public void UpdateEditCubes()
+    {
+        cubes.Clear();
+        selectedCubes.Clear();
+        highlightedCube = null;
+
+        for(int i = 0; i < scene.levelWidth; i++)
+        {
+            for(int j = 0; j < scene.levelHeight; j++)
+            {
+                cubes.Add(scene.cubes[i, j] as EditCube);
+            }
+        }
     }
 
     public void OpenButtonClicked()
@@ -117,7 +133,7 @@ public class EditingManager : MonoBehaviour
         string filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/levels", "xml");
         scene.Clear();
         scene.ReadLevel(filePath, true);
-
+        UpdateEditCubes();
     }
 
     public void SaveButtonClicked()
