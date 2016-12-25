@@ -42,6 +42,10 @@ public class EditCube : Cube
         {
             return Color.green;
         }
+        else if(cubeType == CubeType.Wall)
+        {
+            return new Color(0.1f, 0.1f, 0.1f);
+        }
         return Color.black;
     }
 
