@@ -32,7 +32,7 @@ public class EditingManager : MonoBehaviour
     void Start()
     {
         scene = new Scene();
-        lastOpenedScenePath = "Assets/levels/newLevel.xml";
+        lastOpenedScenePath = "Assets/Resources/Levels/newLevel.xml";
     }
 
     void Update()
@@ -109,7 +109,7 @@ public class EditingManager : MonoBehaviour
         scene.Clear();
         scene.CreateNewLevel((int)widthSlider.value, (int)heightSlider.value);
 
-        lastOpenedScenePath = "Assets/levels/newLevel.xml";
+        lastOpenedScenePath = "Assets/Resources/Levels/newLevel.xml";
         UpdateEditCubes();
     }
 
@@ -130,7 +130,7 @@ public class EditingManager : MonoBehaviour
 
     public void OpenButtonClicked()
     {
-        string filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/levels", "xml");
+        string filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/Resources/Levels", "xml");
         scene.Clear();
         scene.ReadLevel(filePath, true);
         UpdateEditCubes();

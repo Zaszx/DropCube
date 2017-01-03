@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Xml;
 
 public enum Direction
@@ -10,21 +11,31 @@ public enum Direction
     Right,
 }
 
+public enum SceneStatus
+{
+    Loading,
+    Idle,
+    Rotating,
+    Moving,
+}
+
 public class Scene
 {
     public int levelWidth;
     public int levelHeight;
     public Direction gravityDirection;
+    public Cube[,] staticCubes;
     public Cube[,] cubes;
+    public List<Cube> dynamicCubes;
     public Vector3 cameraPosition;
     public Bounds sceneBounds;
     public GameObject levelRootObject;
     public string scenePath;
-
+    public SceneStatus sceneStatus;
 
     public Scene()
     {
-
+        sceneStatus = SceneStatus.Idle;
     }
 
     public void Clear()
@@ -104,6 +115,33 @@ public class Scene
         cameraPosition = Camera.main.transform.position;
     }
 
+    public void Tick()
+    {
+
+    }
+
+    public IEnumerator RotateCoroutine(bool clockwise)
+    {
+        sceneStatus = SceneStatus.Rotating;
+
+        float totalTime = 1.0f;
+        float accumulatedTime = 0.0f;
+
+        Quaternion initialRotation = levelRootObject.transform.rotation;
+        Quaternion targetRotation = Quaternion.Euler(levelRootObject.transform.rotation.eulerAngles + Vector3.up * (clockwise ? 90 : -90));
+
+        while(accumulatedTime < totalTime)
+        {
+            levelRootObject.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, accumulatedTime / totalTime);
+            yield return new WaitForEndOfFrame();
+            accumulatedTime = accumulatedTime + Time.deltaTime;
+        }
+
+        levelRootObject.transform.rotation = targetRotation;
+
+        sceneStatus = SceneStatus.Idle;
+    }
+
     public void ReadLevel(string path, bool isEditMode)
     {
         scenePath = path;
@@ -120,7 +158,12 @@ public class Scene
         int levelHeight = int.Parse(levelRootNode.Attributes["levelHeight"].Value);
         this.levelHeight = levelHeight;
 
+        levelRootObject.transform.position = new Vector3(levelWidth * 0.5f - 0.5f, 0, levelHeight * 0.5f - 0.5f);
+
         cubes = new Cube[levelWidth, levelHeight];
+        staticCubes = new Cube[levelWidth, levelHeight];
+        dynamicCubes = new List<Cube>();
+
         int cubeIndex = 0;
 
         XmlNode cubesNode = levelRootNode.FirstChild;
@@ -144,6 +187,23 @@ public class Scene
             if(isEditMode)
             {
                 (newCube as EditCube).cubeType = cubeType;
+            }
+            else
+            {
+                if(newCube.IsStatic() == false)
+                {
+                    newCube.transform.position += Vector3.up * 0.01f;
+                    dynamicCubes.Add(newCube);
+
+                    Cube staticCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
+                    staticCube.transform.position = new Vector3(x, 0, y);
+                    staticCube.transform.parent = levelRootObject.transform;
+                    staticCubes[x, y] = staticCube;
+                }
+                else
+                {
+                    staticCubes[x, y] = newCube;
+                }
             }
 
             newCube.transform.parent = levelRootObject.transform;

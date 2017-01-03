@@ -25,4 +25,9 @@ public class GoodCube : Cube
     {
         return CubeType.Good;
     }
+
+    public override bool IsStatic()
+    {
+        return false;
+    }
 }

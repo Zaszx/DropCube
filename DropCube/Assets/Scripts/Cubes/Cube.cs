@@ -19,8 +19,9 @@ public class Cube : MonoBehaviour
 	
 	public virtual void Update () 
     {
-	    
-	}
+        UpdateShaderProperties();
+
+    }
 
     public virtual void UpdateShaderProperties()
     {
@@ -31,6 +32,11 @@ public class Cube : MonoBehaviour
     public virtual Color GetCubeColor()
     {
         return Color.gray;
+    }
+
+    public virtual bool IsStatic()
+    {
+        return true;
     }
 
     public virtual CubeType GetCubeType()
