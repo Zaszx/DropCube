@@ -12,6 +12,7 @@ public enum CubeType
 public class Cube : MonoBehaviour 
 {
     public bool isMarkedToMove;
+    public Scene scene;
 	public virtual void Start () 
     {
         isMarkedToMove = false;
@@ -46,7 +47,7 @@ public class Cube : MonoBehaviour
 
     public virtual void OnFallDown()
     {
-
+        scene.OnCubeFallsDown(this);
     }
 
     public IEnumerator MoveCoroutine(float totalTime, Cube targetCube)

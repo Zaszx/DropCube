@@ -74,6 +74,7 @@ public class Scene
                 Cube newCube = GameObject.Instantiate(Prefabs.editCube).GetComponent<Cube>();
                 newCube.transform.position = new Vector3(i, 0, j);
                 newCube.transform.rotation = Quaternion.identity;
+                newCube.scene = this;
 
                 cubes[i, j] = newCube;
 
@@ -259,6 +260,42 @@ public class Scene
         return null;
     }
 
+    public void RestartLevel()
+    {
+
+    }
+
+    public void WinLevel()
+    {
+
+    }
+
+    public void OnCubeFallsDown(Cube cube)
+    {
+        if(cube.GetCubeType() == CubeType.Good)
+        {
+            gameManager.StopAllCoroutines();
+            RestartLevel();
+        }
+        else if(cube.GetCubeType() == CubeType.Bad)
+        {
+            dynamicCubes.Remove(cube);
+            bool andBadCubeLeft = false;
+            foreach(Cube c in dynamicCubes)
+            {
+                if(c.GetCubeType() == CubeType.Bad)
+                {
+                    andBadCubeLeft = true;
+                }
+            }
+            if(andBadCubeLeft == false)
+            {
+                gameManager.StopAllCoroutines();
+                WinLevel();
+            }
+        }
+    }
+
     public void ReadLevel(string path, bool isEditMode)
     {
         scenePath = path;
@@ -299,6 +336,7 @@ public class Scene
             int y = cubeIndex % levelHeight;
 
             Cube newCube = GameObject.Instantiate(cubePrefab).GetComponent<Cube>();
+            newCube.scene = this;
 
             newCube.transform.position = new Vector3(x, 0, y);
             if(isEditMode)
@@ -313,6 +351,7 @@ public class Scene
                     dynamicCubes.Add(newCube);
 
                     Cube staticCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
+                    staticCube.scene = this;
                     staticCube.transform.position = new Vector3(x, 0, y);
                     staticCube.transform.parent = levelRootObject.transform;
                     staticCubes[x, y] = staticCube;
