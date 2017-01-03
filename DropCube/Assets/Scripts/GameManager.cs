@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 	void Start () 
     {
         scene = new Scene();
+        scene.gameManager = this;
         scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
 	}
 

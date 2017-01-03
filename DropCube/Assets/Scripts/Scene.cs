@@ -5,10 +5,10 @@ using System.Xml;
 
 public enum Direction
 {
-    Up,
-    Left,
     Down,
     Right,
+    Up,
+    Left,
 }
 
 public enum SceneStatus
@@ -32,10 +32,18 @@ public class Scene
     public GameObject levelRootObject;
     public string scenePath;
     public SceneStatus sceneStatus;
+    public GameManager gameManager;
+
+    public Vector2[] possibleGravityDirections = new Vector2[4];
 
     public Scene()
     {
         sceneStatus = SceneStatus.Idle;
+
+        possibleGravityDirections[(int)Direction.Down] = Vector2.up;
+        possibleGravityDirections[(int)Direction.Right] = Vector2.left;
+        possibleGravityDirections[(int)Direction.Up] = Vector2.down;
+        possibleGravityDirections[(int)Direction.Left] = Vector2.right;
     }
 
     public void Clear()
@@ -139,7 +147,116 @@ public class Scene
 
         levelRootObject.transform.rotation = targetRotation;
 
+        gravityDirection = gravityDirection + (clockwise ? 1 : -1);
+        gravityDirection = (Direction)((int)gravityDirection % 4);
+        if(gravityDirection < 0)
+        {
+            gravityDirection = gravityDirection + 4;
+        }
+
+        yield return new WaitForEndOfFrame();
+
+        sceneStatus = SceneStatus.Moving;
+
+        Vector2 gravityInVec2 = possibleGravityDirections[(int)gravityDirection];
+        Debug.Log(gravityInVec2);
+        Vector2 iterationAmount = gravityInVec2;
+        if (iterationAmount.x == 0) iterationAmount.x = -1;
+        if (iterationAmount.y == 0) iterationAmount.y = -1;
+        Vector2 iterationBeginPoint = GetIterationBeginPoint(gravityInVec2);
+        int iterationCount = 0;
+        while(true)
+        {
+            List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
+            for(int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
+            {
+                for (int j = (int)iterationBeginPoint.y; (j < levelHeight && j >= 0); j = j - (int)iterationAmount.y)
+                {
+                    Cube currentCube = cubes[i, j];
+                    if(currentCube.IsStatic() == false)
+                    {
+                        Cube neighbourToMove = GetCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y));
+                        if(neighbourToMove == null || (
+                            (neighbourToMove.IsStatic() == true || neighbourToMove.isMarkedToMove == true) && neighbourToMove.GetCubeType() != CubeType.Wall))
+                        {
+                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(0.3f, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
+                            allCoroutinesToWait.Add(newCoroutine);
+                        }
+                    }
+                }
+            }
+
+            for (int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
+            {
+                for (int j = (int)iterationBeginPoint.y; (j < levelHeight && j >= 0); j = j - (int)iterationAmount.y)
+                {
+                    int ii = i;
+                    int jj = j;
+                    Cube currentCube = cubes[i, j];
+                    if (currentCube.isMarkedToMove)
+                    {
+                        Debug.Log(currentCube.name);
+                        cubes[i, j] = staticCubes[i, j];
+                        Cube neighbourToMove = GetCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y));
+                        if (neighbourToMove != null)
+                        {
+                            cubes[(int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y)] = currentCube;
+                            Debug.Log(new Vector2((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y)) + " REPLACED WITH " + new Vector2(i, j));
+                        }
+                    }
+                }
+            }
+
+            if (allCoroutinesToWait.Count == 0)
+            {
+                break;
+            }
+            else
+            {
+                foreach(Coroutine c in allCoroutinesToWait)
+                {
+                    yield return c;
+                }
+            }
+
+            iterationCount++;
+        }
+
+        Debug.Log("ITERATION COUNT: " + iterationCount);
+
         sceneStatus = SceneStatus.Idle;
+    }
+
+    Vector2 GetIterationBeginPoint(Vector2 gravity)
+    {
+        Vector2 result = Vector2.zero;
+        if(gravity.x == 1)
+        {
+            result.x = levelWidth - 1;
+        }
+        if(gravity.y == 1)
+        {
+            result.y = levelHeight - 1;
+        }
+        return result;
+    }
+
+    public Cube GetCubeWithIndex(int x, int y)
+    {
+        if (x >= 0 && x < levelWidth && y >= 0 && y < levelHeight)
+        {
+            return cubes[x, y];
+        }
+        return null;
+    }
+
+    public Cube GetStaticCubeWithIndex(int x, int y)
+    {
+        if (x >= 0 && x < levelWidth && y >= 0 && y < levelHeight)
+        {
+            return staticCubes[x, y];
+        }
+        return null;
     }
 
     public void ReadLevel(string path, bool isEditMode)
