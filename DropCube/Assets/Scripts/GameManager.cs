@@ -1,16 +1,58 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
     Scene scene;
     SwipeData swipeData = new SwipeData();
-	void Start () 
+
+    List<Level> levels = new List<Level>();
+    MenuManager menuManager = new MenuManager();
+
+    void Awake()
+    {
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+    }
+
+    void Start () 
     {
         scene = new Scene();
         scene.gameManager = this;
-        scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
+
+        menuManager.InitMenu(this, levels);
+
+        //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
 	}
+
+    public void OnLevelButtonClicked(Level level)
+    {
+        
+    }
 
     public Vector2 GetDigitalDirectionFromAnalog(Vector2 analogDirection)
     {

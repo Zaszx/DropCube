@@ -280,6 +280,7 @@ public class Scene
         else if(cube.GetCubeType() == CubeType.Bad)
         {
             dynamicCubes.Remove(cube);
+            GameObject.Destroy(cube.gameObject);
             bool andBadCubeLeft = false;
             foreach(Cube c in dynamicCubes)
             {
@@ -296,12 +297,22 @@ public class Scene
         }
     }
 
-    public void ReadLevel(string path, bool isEditMode)
+    public void ReadLevel(Level level, string path, bool isEditMode)
     {
         scenePath = path;
 
         XmlDocument xmlDocument = new XmlDocument();
-        xmlDocument.Load(path);
+
+        if(level == null)
+        {
+            xmlDocument.Load(path);
+        }
+        else
+        {
+            xmlDocument.LoadXml(level.textAsset.text);
+            path = level.path;
+            scenePath = path;
+        }
 
         string[] filePathSplitted = path.Split('/');
         levelRootObject = new GameObject(filePathSplitted[filePathSplitted.Length - 1]);

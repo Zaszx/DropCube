@@ -8,6 +8,8 @@ public static class Prefabs
     public static GameObject goodCube;
     public static GameObject badCube;
     public static GameObject wallCube;
+
+    public static GameObject levelButton;
     
     static Prefabs()
     {
@@ -16,6 +18,8 @@ public static class Prefabs
         goodCube = Resources.Load<GameObject>("Prefabs/GoodCube");
         badCube = Resources.Load<GameObject>("Prefabs/BadCube");
         wallCube = Resources.Load<GameObject>("Prefabs/WallCube");
+
+        levelButton = Resources.Load<GameObject>("Prefabs/UI/levelButton");
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)

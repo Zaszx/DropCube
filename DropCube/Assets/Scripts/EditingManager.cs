@@ -132,7 +132,7 @@ public class EditingManager : MonoBehaviour
     {
         string filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/Resources/Levels", "xml");
         scene.Clear();
-        scene.ReadLevel(filePath, true);
+        scene.ReadLevel(null, filePath, true);
         UpdateEditCubes();
     }
 
