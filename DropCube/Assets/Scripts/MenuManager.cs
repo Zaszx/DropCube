@@ -15,7 +15,7 @@ public class MenuManager
         this.gameManager = gameManager;
 
         menuParent = GameObject.Find("MenuParent");
-        buttonsParent = new GameObject("ButtonsParent");
+        buttonsParent = GameObject.Find("ButtonsParent");
         buttonsParent.transform.parent = menuParent.transform;
         buttonsParent.transform.position = Vector3.zero;
 

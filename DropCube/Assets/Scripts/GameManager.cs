@@ -6,6 +6,8 @@ public enum GameState
 {
     Menu,
     Game,
+    LevelCleared,
+
 }
 
 public class GameManager : MonoBehaviour 
@@ -15,13 +17,16 @@ public class GameManager : MonoBehaviour
 
     List<Level> levels = new List<Level>();
     MenuManager menuManager = new MenuManager();
+    LevelClearedScreenManager levelClearedScreenManager = new LevelClearedScreenManager();
+
+    int openLevelIndex;
 
     public GameState gameState;
 
     void Awake()
     {
+        levels.Add(new Level("Levels/level0"));
         levels.Add(new Level("Levels/level1"));
-        levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
@@ -53,11 +58,26 @@ public class GameManager : MonoBehaviour
         scene.gameManager = this;
 
         menuManager.InitMenu(this, levels);
-        menuManager.SetVisible(true);
-        gameState = GameState.Menu;
+        levelClearedScreenManager.Init(this);
+        OpenMenu();
+
+        openLevelIndex = 0;
 
         //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
 	}
+
+    public void OpenMenu()
+    {
+        menuManager.SetVisible(true);
+        gameState = GameState.Menu;
+    }
+
+    public void NextLevel()
+    {
+        openLevelIndex++;
+        scene.ReadLevel(levels[openLevelIndex], "", false);
+        gameState = GameState.Game;
+    }
 
     public void OnLevelButtonClicked(Level level)
     {
@@ -66,6 +86,8 @@ public class GameManager : MonoBehaviour
         scene.ReadLevel(level, "", false);
         gameState = GameState.Game;
         menuManager.SetVisible(false);
+
+        openLevelIndex = levels.IndexOf(level);
     }
 
     public Vector2 GetDigitalDirectionFromAnalog(Vector2 analogDirection)
@@ -90,25 +112,34 @@ public class GameManager : MonoBehaviour
         return result;
     }
 
+    public void OnLevelFinished(int starCount)
+    {
+        gameState = GameState.LevelCleared;
+        levelClearedScreenManager.OnLevelCleared(starCount);
+    }
+
     void Update () 
     {
-        swipeData.Tick();
-        scene.Tick();
-
-        if(swipeData.swipeStatus == SwipeStatus.Finished)
+        if(gameState == GameState.Game)
         {
-            if(scene.sceneStatus == SceneStatus.Idle)
-            {
-                Vector2 resultSwipe = swipeData.resultSwipe;
-                Vector2 swipeDirection = GetDigitalDirectionFromAnalog(resultSwipe);
-                bool isRotating = (swipeDirection == Vector2.left || swipeDirection == Vector2.right);
-                if(isRotating)
-                {
-                    StartCoroutine(scene.RotateCoroutine(swipeDirection == Vector2.right));
-                }
-            }
+            swipeData.Tick();
+            scene.Tick();
 
-            swipeData.Reset();
+            if (swipeData.swipeStatus == SwipeStatus.Finished)
+            {
+                if (scene.sceneStatus == SceneStatus.Idle)
+                {
+                    Vector2 resultSwipe = swipeData.resultSwipe;
+                    Vector2 swipeDirection = GetDigitalDirectionFromAnalog(resultSwipe);
+                    bool isRotating = (swipeDirection == Vector2.left || swipeDirection == Vector2.right);
+                    if (isRotating)
+                    {
+                        StartCoroutine(scene.RotateCoroutine(swipeDirection == Vector2.right));
+                    }
+                }
+
+                swipeData.Reset();
+            }
         }
 	}
 

@@ -10,6 +10,7 @@ public static class Prefabs
     public static GameObject wallCube;
 
     public static GameObject levelButton;
+    public static GameObject tickObject;
     
     static Prefabs()
     {
@@ -20,6 +21,8 @@ public static class Prefabs
         wallCube = Resources.Load<GameObject>("Prefabs/WallCube");
 
         levelButton = Resources.Load<GameObject>("Prefabs/UI/levelButton");
+
+        tickObject = Resources.Load<GameObject>("Prefabs/UI/TickIcon");
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)

@@ -34,6 +34,8 @@ public class Scene
     public SceneStatus sceneStatus;
     public GameManager gameManager;
 
+    public GameObject ticksParent;
+
     public Vector2[] possibleGravityDirections = new Vector2[4];
 
     public Scene()
@@ -44,6 +46,8 @@ public class Scene
         possibleGravityDirections[(int)Direction.Right] = Vector2.left;
         possibleGravityDirections[(int)Direction.Up] = Vector2.down;
         possibleGravityDirections[(int)Direction.Left] = Vector2.right;
+
+        ticksParent = GameObject.Find("TicksParent");
     }
 
     public void Clear()
@@ -267,7 +271,7 @@ public class Scene
 
     public void WinLevel()
     {
-
+        gameManager.OnLevelFinished(0);
     }
 
     public void OnCubeFallsDown(Cube cube)
@@ -279,6 +283,7 @@ public class Scene
         }
         else if(cube.GetCubeType() == CubeType.Bad)
         {
+            Vector3 cubeLastPosition = cube.transform.position;
             dynamicCubes.Remove(cube);
             GameObject.Destroy(cube.gameObject);
             bool andBadCubeLeft = false;
@@ -294,11 +299,27 @@ public class Scene
                 gameManager.StopAllCoroutines();
                 WinLevel();
             }
+            else
+            {
+                gameManager.StartCoroutine(CreateTick(cubeLastPosition));
+            }
         }
+    }
+
+    public IEnumerator CreateTick(Vector3 worldPosition)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+        GameObject tickObject = GameObject.Instantiate(Prefabs.tickObject);
+        tickObject.transform.SetParent(ticksParent.transform);
+        tickObject.transform.position = screenPosition;
+        yield return new WaitForSeconds(0.5f);
+        GameObject.Destroy(tickObject);
     }
 
     public void ReadLevel(Level level, string path, bool isEditMode)
     {
+        Clear();
+
         scenePath = path;
 
         XmlDocument xmlDocument = new XmlDocument();
@@ -386,6 +407,8 @@ public class Scene
         sceneBounds.Encapsulate(new Vector3(levelWidth - 0.5f, 0, levelWidth - 0.5f));
 
         ComputeCameraPosition();
+
+        sceneStatus = SceneStatus.Idle;
     }
 
     public void WriteLevel(string path)
