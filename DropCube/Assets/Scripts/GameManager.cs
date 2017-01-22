@@ -2,6 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum GameState
+{
+    Menu,
+    Game,
+}
+
 public class GameManager : MonoBehaviour 
 {
     Scene scene;
@@ -10,9 +16,11 @@ public class GameManager : MonoBehaviour
     List<Level> levels = new List<Level>();
     MenuManager menuManager = new MenuManager();
 
+    public GameState gameState;
+
     void Awake()
     {
-        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/level1"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
@@ -45,13 +53,19 @@ public class GameManager : MonoBehaviour
         scene.gameManager = this;
 
         menuManager.InitMenu(this, levels);
+        menuManager.SetVisible(true);
+        gameState = GameState.Menu;
 
         //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
 	}
 
     public void OnLevelButtonClicked(Level level)
     {
-        
+        scene = new Scene();
+        scene.gameManager = this;
+        scene.ReadLevel(level, "", false);
+        gameState = GameState.Game;
+        menuManager.SetVisible(false);
     }
 
     public Vector2 GetDigitalDirectionFromAnalog(Vector2 analogDirection)

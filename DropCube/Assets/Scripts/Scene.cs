@@ -118,7 +118,7 @@ public class Scene
         Camera.main.transform.position = sceneBounds.center + new Vector3(0, 1, 0);
         Camera.main.transform.LookAt(sceneBounds.center);
 
-        Camera.main.orthographicSize = Mathf.Max(requiredVerticalExtent, requiredHorizontalExtent) * 1.1f;
+        Camera.main.orthographicSize = Mathf.Max(requiredVerticalExtent, requiredHorizontalExtent) * 1.3f;
         Camera.main.transform.rotation = Quaternion.Euler(90, 180, 0);
 
         cameraPosition = Camera.main.transform.position;

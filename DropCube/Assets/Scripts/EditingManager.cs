@@ -139,7 +139,7 @@ public class EditingManager : MonoBehaviour
         UpdateEditCubes();
 
         screenshotPath = filePath.Substring(0, filePath.LastIndexOf("/"));
-        screenshotPath = screenshotPath + "ss.png";
+        screenshotPath = screenshotPath + "/ss.png";
     }
 
     public void SaveButtonClicked()

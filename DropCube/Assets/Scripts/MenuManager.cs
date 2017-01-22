@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MenuManager
 {
-    public Canvas canvas;
+    public GameObject menuParent;
     public GameManager gameManager;
     public Dictionary<Button, Level> buttonToLevelMap = new Dictionary<Button, Level>();
     public GameObject buttonsParent;
@@ -14,22 +14,20 @@ public class MenuManager
     {
         this.gameManager = gameManager;
 
-        canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        menuParent = GameObject.Find("MenuParent");
         buttonsParent = new GameObject("ButtonsParent");
-        buttonsParent.transform.parent = canvas.transform;
+        buttonsParent.transform.parent = menuParent.transform;
         buttonsParent.transform.position = Vector3.zero;
 
         float minLength = Mathf.Min(Screen.width, Screen.height) * 0.9f;
         float buttonSize = minLength * 0.2f;
         float iterationSize = buttonSize * 1.05f;
 
-        Debug.Log("Screen width: " + Screen.width + " Height: " + Screen.height + " MinLen: " + minLength + " ButtonSize: " + buttonSize);
-
         for(int i = 0; i < levels.Count; i++)
         {
             Vector3 position = new Vector3(((i % 5) - 2) * iterationSize, -((i / 5) - 2) * iterationSize, 0);
             Button newButton = GameObject.Instantiate(Prefabs.levelButton).GetComponent<Button>();
-            newButton.transform.parent = buttonsParent.transform;
+            newButton.transform.SetParent(buttonsParent.transform);
             RectTransform newButtonTransform = newButton.GetComponent<RectTransform>();
             newButtonTransform.position = position;
             newButtonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
@@ -51,5 +49,10 @@ public class MenuManager
     {
         Debug.Log("Button pressed!");
         gameManager.OnLevelButtonClicked(buttonToLevelMap[button]);
+    }
+
+    public void SetVisible(bool value)
+    {
+        menuParent.SetActive(value);
     }
 }
