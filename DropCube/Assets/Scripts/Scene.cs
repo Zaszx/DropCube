@@ -56,6 +56,11 @@ public class Scene
         {
             for (int j = 0; j < levelHeight; j++)
             {
+                Cube currentCube = cubes[i, j];
+                if(currentCube.IsStatic() == false)
+                {
+                    GameObject.Destroy(staticCubes[i, j].gameObject);
+                }
                 GameObject.Destroy(cubes[i, j].gameObject);
             }
         }

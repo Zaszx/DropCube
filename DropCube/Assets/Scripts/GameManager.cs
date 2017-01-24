@@ -75,6 +75,9 @@ public class GameManager : MonoBehaviour
     public void NextLevel()
     {
         openLevelIndex++;
+        scene.Clear();
+        scene = new Scene();
+        scene.gameManager = this;
         scene.ReadLevel(levels[openLevelIndex], "", false);
         gameState = GameState.Game;
     }
