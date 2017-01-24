@@ -15,6 +15,7 @@ public enum SceneStatus
 {
     Loading,
     Idle,
+    Undoing,
     Rotating,
     Moving,
 }
@@ -26,13 +27,15 @@ public class Scene
     public Direction gravityDirection;
     public Cube[,] staticCubes;
     public Cube[,] cubes;
-    public List<Cube> dynamicCubes;
+    public List<Cube> dynamicCubes = new List<Cube>();
     public Vector3 cameraPosition;
     public Bounds sceneBounds;
     public GameObject levelRootObject;
     public string scenePath;
     public SceneStatus sceneStatus;
     public GameManager gameManager;
+
+    public UndoManager undoManager = new UndoManager();
 
     public GameObject ticksParent;
 
@@ -62,6 +65,13 @@ public class Scene
                     GameObject.Destroy(staticCubes[i, j].gameObject);
                 }
                 GameObject.Destroy(cubes[i, j].gameObject);
+            }
+        }
+        foreach(Cube c in dynamicCubes)
+        {
+            if(c != null && c.gameObject != null)
+            {
+                GameObject.Destroy(c.gameObject);
             }
         }
         GameObject.Destroy(levelRootObject);
@@ -166,6 +176,12 @@ public class Scene
 
         yield return new WaitForEndOfFrame();
 
+        Dictionary<Cube, Vector3> cubeOriginalPositions = new Dictionary<Cube, Vector3>();
+        foreach(Cube c in dynamicCubes)
+        {
+            cubeOriginalPositions[c] = c.transform.position;
+        }
+
         sceneStatus = SceneStatus.Moving;
 
         Vector2 gravityInVec2 = possibleGravityDirections[(int)gravityDirection];
@@ -232,8 +248,23 @@ public class Scene
             iterationCount++;
         }
 
-        Debug.Log("ITERATION COUNT: " + iterationCount);
+        SceneUndoData newUndoData = new SceneUndoData();
+        foreach(Cube c in dynamicCubes)
+        {
+            if(c.transform.position != cubeOriginalPositions[c])
+            {
+                CubeUndoData currentCubeData = new CubeUndoData();
+                currentCubeData.cube = c;
+                currentCubeData.fellDown = c.isActiveAndEnabled;
+                currentCubeData.startPosition = cubeOriginalPositions[c];
+                currentCubeData.endPosition = c.transform.position;
 
+                newUndoData.cubeData.Add(currentCubeData);
+            }
+        }
+        newUndoData.isRotationClockwise = clockwise;
+        undoManager.AddData(newUndoData);
+        
         sceneStatus = SceneStatus.Idle;
     }
 
@@ -289,8 +320,7 @@ public class Scene
         else if(cube.GetCubeType() == CubeType.Bad)
         {
             Vector3 cubeLastPosition = cube.transform.position;
-            dynamicCubes.Remove(cube);
-            GameObject.Destroy(cube.gameObject);
+            cube.gameObject.SetActive(false);
             bool andBadCubeLeft = false;
             foreach(Cube c in dynamicCubes)
             {
