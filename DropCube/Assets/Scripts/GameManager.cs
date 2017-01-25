@@ -143,6 +143,14 @@ public class GameManager : MonoBehaviour
 
                 swipeData.Reset();
             }
+
+            if(Input.GetKeyDown(KeyCode.Z))
+            {
+                if(scene.undoManager.doneOperations.Count > 0)
+                {
+                    StartCoroutine(scene.UndoCoroutine());
+                }
+            }
         }
 	}
 

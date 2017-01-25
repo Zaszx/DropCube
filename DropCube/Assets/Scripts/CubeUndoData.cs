@@ -8,4 +8,6 @@ public class CubeUndoData
     public Vector3 startPosition;
     public Vector3 endPosition;
     public bool fellDown;
+
+    public int fallAmount;
 }

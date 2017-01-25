@@ -24,6 +24,18 @@ public class Cube : MonoBehaviour
 
     }
 
+    public IEnumerator MoveTo(Vector3 position, float time)
+    {
+        float accumulatedTime = 0.0f;
+        Vector3 initialPosition = transform.position;
+        while(accumulatedTime < time)
+        {
+            transform.position = Vector3.Lerp(initialPosition, position, accumulatedTime / time);
+            yield return new WaitForEndOfFrame();
+            accumulatedTime = accumulatedTime + Time.deltaTime;
+        }
+    }
+
     public virtual void UpdateShaderProperties()
     {
         Renderer thisRenderer = GetComponent<Renderer>();

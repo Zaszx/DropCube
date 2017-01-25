@@ -268,6 +268,96 @@ public class Scene
         sceneStatus = SceneStatus.Idle;
     }
 
+    public IEnumerator UndoCoroutine()
+    {
+        sceneStatus = SceneStatus.Undoing;
+        SceneUndoData undoData = undoManager.GetLastOperation();
+        int maxFallAmount = 0;
+        foreach(CubeUndoData cubeData in undoData.cubeData)
+        {
+            cubeData.fallAmount = Mathf.RoundToInt(Vector3.Distance(cubeData.startPosition, cubeData.endPosition));
+            maxFallAmount = Mathf.Max(maxFallAmount, cubeData.fallAmount);
+        }
+
+        float waitAmount = 0.2f;
+        List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
+        for(int i = maxFallAmount; i > 0; i--)
+        {
+            foreach (CubeUndoData cubeData in undoData.cubeData)
+            {
+                if(cubeData.fallAmount == i)
+                {
+                    Coroutine c = gameManager.StartCoroutine(cubeData.cube.MoveTo(cubeData.startPosition, waitAmount * i));
+                    allCoroutinesToWait.Add(c);
+                }
+            }
+            yield return new WaitForSeconds(waitAmount);
+        }
+
+        foreach(Coroutine c in allCoroutinesToWait)
+        {
+            yield return c;
+        }
+
+        float totalTime = 1.0f;
+        float accumulatedTime = 0.0f;
+
+        Quaternion initialRotation = levelRootObject.transform.rotation;
+        Quaternion targetRotation = Quaternion.Euler(levelRootObject.transform.rotation.eulerAngles + Vector3.up * (undoData.isRotationClockwise ? -90 : 90));
+
+        while (accumulatedTime < totalTime)
+        {
+            levelRootObject.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, accumulatedTime / totalTime);
+            yield return new WaitForEndOfFrame();
+            accumulatedTime = accumulatedTime + Time.deltaTime;
+        }
+
+        levelRootObject.transform.rotation = targetRotation;
+
+        gravityDirection = gravityDirection + (undoData.isRotationClockwise ? -1 : 1);
+        gravityDirection = (Direction)((int)gravityDirection % 4);
+        if (gravityDirection < 0)
+        {
+            gravityDirection = gravityDirection + 4;
+        }
+
+        UpdateGridFromCubePositions();
+
+        sceneStatus = SceneStatus.Idle;
+    }
+
+    public void UpdateGridFromCubePositions()
+    {
+        for (int i = 0; i < levelWidth; i++)
+        {
+            for (int j = 0; j < levelHeight; j++)
+            {
+                Cube staticCube = staticCubes[i, j];
+                int cubeX = Mathf.RoundToInt(staticCube.transform.position.x);
+                int cubeZ = Mathf.RoundToInt(staticCube.transform.position.z);
+                cubes[cubeX, cubeZ] = staticCube;
+            }
+        }
+
+        for (int i = 0; i < levelWidth; i++)
+        {
+            for (int j = 0; j < levelHeight; j++)
+            {
+                staticCubes[i, j] = cubes[i, j];
+            }
+        }
+
+        foreach (Cube c in dynamicCubes)
+        {
+            int cubeX = Mathf.RoundToInt(c.transform.position.x);
+            int cubeZ = Mathf.RoundToInt(c.transform.position.z);
+
+            cubes[cubeX, cubeZ] = c;
+        }
+
+        gravityDirection = Direction.Down;
+    }
+
     Vector2 GetIterationBeginPoint(Vector2 gravity)
     {
         Vector2 result = Vector2.zero;
