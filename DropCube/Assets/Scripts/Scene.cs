@@ -18,6 +18,7 @@ public enum SceneStatus
     Undoing,
     Rotating,
     Moving,
+    Errored,
 }
 
 public class Scene
@@ -264,8 +265,11 @@ public class Scene
         }
         newUndoData.isRotationClockwise = clockwise;
         undoManager.AddData(newUndoData);
-        
-        sceneStatus = SceneStatus.Idle;
+
+        if (sceneStatus != SceneStatus.Errored)
+        {
+            sceneStatus = SceneStatus.Idle;
+        }
     }
 
     public IEnumerator UndoCoroutine()
@@ -279,7 +283,7 @@ public class Scene
             maxFallAmount = Mathf.Max(maxFallAmount, cubeData.fallAmount);
         }
 
-        float waitAmount = 0.2f;
+        float waitAmount = 0.1f;
         List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
         for(int i = maxFallAmount; i > 0; i--)
         {
@@ -287,6 +291,7 @@ public class Scene
             {
                 if(cubeData.fallAmount == i)
                 {
+                    cubeData.cube.gameObject.SetActive(true);
                     Coroutine c = gameManager.StartCoroutine(cubeData.cube.MoveTo(cubeData.startPosition, waitAmount * i));
                     allCoroutinesToWait.Add(c);
                 }
@@ -299,7 +304,7 @@ public class Scene
             yield return c;
         }
 
-        float totalTime = 1.0f;
+        float totalTime = 0.3f;
         float accumulatedTime = 0.0f;
 
         Quaternion initialRotation = levelRootObject.transform.rotation;
@@ -323,7 +328,10 @@ public class Scene
 
         UpdateGridFromCubePositions();
 
-        sceneStatus = SceneStatus.Idle;
+        if(sceneStatus != SceneStatus.Errored)
+        {
+            sceneStatus = SceneStatus.Idle;
+        }
     }
 
     public void UpdateGridFromCubePositions()
@@ -351,8 +359,10 @@ public class Scene
         {
             int cubeX = Mathf.RoundToInt(c.transform.position.x);
             int cubeZ = Mathf.RoundToInt(c.transform.position.z);
-
-            cubes[cubeX, cubeZ] = c;
+            if(cubeX < levelWidth && cubeX >= 0 && cubeZ >= 0 && cubeZ < levelHeight)
+            {
+                cubes[cubeX, cubeZ] = c;
+            }
         }
 
         gravityDirection = Direction.Down;
@@ -404,8 +414,7 @@ public class Scene
     {
         if(cube.GetCubeType() == CubeType.Good)
         {
-            gameManager.StopAllCoroutines();
-            RestartLevel();
+            sceneStatus = SceneStatus.Errored;
         }
         else if(cube.GetCubeType() == CubeType.Bad)
         {
@@ -414,12 +423,12 @@ public class Scene
             bool andBadCubeLeft = false;
             foreach(Cube c in dynamicCubes)
             {
-                if(c.GetCubeType() == CubeType.Bad)
+                if(c.isActiveAndEnabled && c.GetCubeType() == CubeType.Bad)
                 {
                     andBadCubeLeft = true;
                 }
             }
-            if(andBadCubeLeft == false)
+            if(andBadCubeLeft == false && sceneStatus != SceneStatus.Errored)
             {
                 gameManager.StopAllCoroutines();
                 WinLevel();

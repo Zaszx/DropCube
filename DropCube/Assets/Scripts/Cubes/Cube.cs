@@ -34,6 +34,7 @@ public class Cube : MonoBehaviour
             yield return new WaitForEndOfFrame();
             accumulatedTime = accumulatedTime + Time.deltaTime;
         }
+        transform.position = position;
     }
 
     public virtual void UpdateShaderProperties()

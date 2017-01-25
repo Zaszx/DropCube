@@ -8,9 +8,11 @@ public class MenuManager
     public GameObject menuParent;
     public GameManager gameManager;
     public Dictionary<Button, Level> buttonToLevelMap = new Dictionary<Button, Level>();
+    public Dictionary<int, Button> levelIndexToButtonMap = new Dictionary<int, Button>();
     public GameObject buttonsParent;
+    public int maxOpenLevel;
 
-    public void InitMenu(GameManager gameManager, List<Level> levels)
+    public void InitMenu(GameManager gameManager, List<Level> levels, int maxOpenLevel)
     {
         this.gameManager = gameManager;
 
@@ -40,15 +42,40 @@ public class MenuManager
             newButton.GetComponent<Image>().sprite = levels[i].image;
 
             buttonToLevelMap.Add(newButton, levels[i]);
+
+            if(i > maxOpenLevel)
+            {
+                Color color = newButton.GetComponent<Image>().color;
+                color.a = 0.3f;
+                newButton.GetComponent<Image>().color = color;
+            }
+
+            levelIndexToButtonMap.Add(i, newButton);
         }
 
+        this.maxOpenLevel = maxOpenLevel;
+
         buttonsParent.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
+    }
+
+    public void UnlockLevel(int index)
+    {
+        if(index > maxOpenLevel)
+        {
+            maxOpenLevel = index;
+            Button button = levelIndexToButtonMap[index];
+            button.GetComponent<Image>().color = Color.white;
+        }
     }
 
     void OnButtonPressed(Button button)
     {
         Debug.Log("Button pressed!");
-        gameManager.OnLevelButtonClicked(buttonToLevelMap[button]);
+        if(button.GetComponent<Image>().color.a >= 0.98f)
+        {
+            gameManager.OnLevelButtonClicked(buttonToLevelMap[button]);
+        }
+
     }
 
     public void SetVisible(bool value)

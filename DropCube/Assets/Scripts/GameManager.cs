@@ -20,8 +20,11 @@ public class GameManager : MonoBehaviour
     LevelClearedScreenManager levelClearedScreenManager = new LevelClearedScreenManager();
 
     int openLevelIndex;
+    int maxOpenLevel;
 
     public GameState gameState;
+
+    public SaveData saveData = new SaveData();
 
     void Awake()
     {
@@ -57,7 +60,10 @@ public class GameManager : MonoBehaviour
         scene = new Scene();
         scene.gameManager = this;
 
-        menuManager.InitMenu(this, levels);
+        saveData.Init();
+        maxOpenLevel = saveData.level;
+
+        menuManager.InitMenu(this, levels, maxOpenLevel);
         levelClearedScreenManager.Init(this);
         OpenMenu();
 
@@ -75,6 +81,13 @@ public class GameManager : MonoBehaviour
     public void NextLevel()
     {
         openLevelIndex++;
+        if(openLevelIndex > maxOpenLevel)
+        {
+            maxOpenLevel = openLevelIndex;
+            menuManager.UnlockLevel(openLevelIndex);
+            saveData.level = maxOpenLevel;
+            saveData.Write();
+        }
         scene.Clear();
         scene = new Scene();
         scene.gameManager = this;
@@ -146,7 +159,7 @@ public class GameManager : MonoBehaviour
 
             if(Input.GetKeyDown(KeyCode.Z))
             {
-                if(scene.undoManager.doneOperations.Count > 0)
+                if((scene.sceneStatus == SceneStatus.Idle || scene.sceneStatus == SceneStatus.Errored) && scene.undoManager.doneOperations.Count > 0)
                 {
                     StartCoroutine(scene.UndoCoroutine());
                 }
