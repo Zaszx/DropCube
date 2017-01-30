@@ -24,6 +24,7 @@ public class MenuManager
         float minLength = Mathf.Min(Screen.width, Screen.height) * 0.9f;
         float buttonSize = minLength * 0.2f;
         float iterationSize = buttonSize * 1.05f;
+        buttonSize = 2000;
 
         for(int i = 0; i < levels.Count; i++)
         {
@@ -32,6 +33,7 @@ public class MenuManager
             newButton.transform.SetParent(buttonsParent.transform);
             RectTransform newButtonTransform = newButton.GetComponent<RectTransform>();
             newButtonTransform.position = position;
+            newButtonTransform.localScale = Vector3.one;
             newButtonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
 
             Text levelText = newButton.GetComponentInChildren<Text>();

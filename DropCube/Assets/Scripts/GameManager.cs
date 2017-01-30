@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public enum GameState
 {
@@ -24,12 +25,40 @@ public class GameManager : MonoBehaviour
 
     public GameState gameState;
 
+    public Button undoButton;
+    public Button menuButton;
+
     public SaveData saveData = new SaveData();
 
     void Awake()
     {
         levels.Add(new Level("Levels/level0"));
         levels.Add(new Level("Levels/level1"));
+        levels.Add(new Level("Levels/level2"));
+        levels.Add(new Level("Levels/level3"));
+        levels.Add(new Level("Levels/level4"));
+        levels.Add(new Level("Levels/level5"));
+        levels.Add(new Level("Levels/level6"));
+        levels.Add(new Level("Levels/level7"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
@@ -136,9 +165,13 @@ public class GameManager : MonoBehaviour
 
     void Update () 
     {
+        swipeData.Tick();
+
         if(gameState == GameState.Game)
         {
-            swipeData.Tick();
+            undoButton.gameObject.SetActive(true);
+            menuButton.gameObject.SetActive(true);
+
             scene.Tick();
 
             if (swipeData.swipeStatus == SwipeStatus.Finished)
@@ -164,7 +197,31 @@ public class GameManager : MonoBehaviour
                     StartCoroutine(scene.UndoCoroutine());
                 }
             }
+
+            if(scene != null)
+            {
+                bool undoAllowed = (scene.sceneStatus == SceneStatus.Idle || scene.sceneStatus == SceneStatus.Errored) && scene.undoManager.doneOperations.Count > 0;
+                undoButton.interactable = undoAllowed;
+            }
+
         }
+        else
+        {
+            undoButton.gameObject.SetActive(false);
+            menuButton.gameObject.SetActive(false);
+        }
+
 	}
+
+    public void UndoButtonClicked()
+    {
+        StartCoroutine(scene.UndoCoroutine());
+    }
+
+    public void MenuButtonClicked()
+    {
+        scene.Clear();
+        menuManager.SetVisible(true);
+    }
 
 }

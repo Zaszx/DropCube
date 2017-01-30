@@ -133,7 +133,10 @@ public class EditingManager : MonoBehaviour
 
     public void OpenButtonClicked()
     {
-        string filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/Resources/Levels", "xml");
+        string filePath = "";
+#if UNITY_EDITOR
+        filePath = EditorUtility.OpenFilePanel("Choose level", "Assets/Resources/Levels", "xml");
+#endif
         scene.Clear();
         scene.ReadLevel(null, filePath, true);
         UpdateEditCubes();

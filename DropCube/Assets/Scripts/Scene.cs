@@ -63,9 +63,16 @@ public class Scene
                 Cube currentCube = cubes[i, j];
                 if(currentCube.IsStatic() == false)
                 {
-                    GameObject.Destroy(staticCubes[i, j].gameObject);
+                    Cube staticCube = staticCubes[i, j];
+                    if(staticCube != null)
+                    {
+                        GameObject.Destroy(staticCube.gameObject);
+                    }
                 }
-                GameObject.Destroy(cubes[i, j].gameObject);
+                if(currentCube != null)
+                {
+                    GameObject.Destroy(cubes[i, j].gameObject);
+                }
             }
         }
         foreach(Cube c in dynamicCubes)
@@ -75,7 +82,162 @@ public class Scene
                 GameObject.Destroy(c.gameObject);
             }
         }
+
+        staticCubes = null;
+        cubes = null;
+        levelWidth = 0;
+        levelHeight = 0;
         GameObject.Destroy(levelRootObject);
+    }
+
+    public void Generate(int complexity)
+    {
+        Clear();
+        int gridSize = Random.Range(complexity / 4, complexity / 3);
+        CreateNewLevel(gridSize, gridSize);
+
+        // Create Holes
+        int holeCount = Random.Range(2, gridSize / 2);
+        for(int i = 0; i < holeCount; i++)
+        {
+            bool holeInX = Random.value < 0.5f;
+            int randomValue = Random.Range(0, gridSize - 1);
+            bool holeInTop = Random.value < 0.5f;
+
+            int holeXIndex = 0;
+            int holeYIndex = 0;
+
+            if(holeInX)
+            {
+                holeXIndex = randomValue;
+                holeYIndex = holeInTop ? 0 : gridSize - 1;
+            }
+            else
+            {
+                holeXIndex = holeInTop ? 0 : gridSize - 1;
+                holeYIndex = randomValue;
+            }
+
+            Cube currentCube = cubes[holeXIndex, holeYIndex];
+            if(currentCube.GetCubeType() == CubeType.Gray)
+            {
+                i--;
+                continue;
+            }
+
+            Cube grayCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
+            grayCube.transform.position = new Vector3(holeXIndex, 0, holeYIndex);
+            ReplaceCubeWith(holeXIndex, holeYIndex, grayCube);
+        }
+
+
+        // Create cubes
+        int cubeCount = Random.Range(complexity / 10, complexity / 3);
+        cubeCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
+        for(int i = 0; i < cubeCount; i++)
+        {
+            int randomX = Random.Range(1, gridSize - 2);
+            int randomY = Random.Range(1, gridSize - 2);
+
+            Cube currentCube = cubes[randomX, randomY];
+            if(currentCube.GetCubeType() != CubeType.Gray)
+            {
+                i--;
+                continue;
+            }
+
+            bool badCube = (i == 0) || Random.value < 0.5f;
+
+            Cube cubeBelow = cubes[randomX, randomY + 1];
+            if(randomX == 1 && cubeBelow.GetCubeType() == CubeType.Gray)
+            {
+                i--;
+                continue;
+            }
+
+            if(cubeBelow.GetCubeType() == CubeType.Gray)
+            {
+                Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
+                wallCube.transform.position = new Vector3(randomX, 0, randomY + 1);
+                ReplaceCubeWith(randomX, randomY + 1, wallCube);
+            }
+
+            Cube newCube = GameObject.Instantiate(badCube ? Prefabs.badCube : Prefabs.goodCube).GetComponent<Cube>();
+            newCube.transform.position = new Vector3(randomX, 0, randomY);
+            ReplaceCubeWith(randomX, randomY, newCube);
+        }
+
+
+        // Generate Walls
+        int wallCount = Random.Range(complexity / 10, complexity / 3);
+        wallCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
+        for(int i = 0; i < wallCount; i++)
+        {
+            int randomX = Random.Range(1, gridSize - 2);
+            int randomY = Random.Range(1, gridSize - 2);
+
+            Cube currentCube = cubes[randomX, randomY];
+            if (currentCube.GetCubeType() != CubeType.Gray)
+            {
+                i--;
+                continue;
+            }
+
+            Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
+            wallCube.transform.position = new Vector3(randomX, 0, randomY);
+            ReplaceCubeWith(randomX, randomY, wallCube); ;
+        }
+    }
+
+    public int GetMovesRequiredToSolve()
+    {
+        int currentDepth = 0;
+        bool solved = false;
+        CubeType[,] levelToInt = new CubeType[levelWidth, levelHeight];
+        for (int i = 0; i < levelWidth; i++ )
+        {
+            for(int j = 0; j < levelHeight; j++)
+            {
+                levelToInt[i, j] = cubes[i, j].GetCubeType();
+            }
+        }
+        while (currentDepth < 20 && solved == false)
+        {
+            currentDepth++;
+            solved = Dfs(0, currentDepth, levelToInt, Vector2.up);
+        }
+        if(solved)
+        {
+            return currentDepth;
+        }
+        return -1;
+    }
+
+    bool Dfs(int depth, int maxDepth, CubeType[,] cubes, Vector2 gravityDirection)
+    {
+        if(depth == maxDepth)
+        {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    void ReplaceCubeWith(int x, int y, Cube newCube)
+    {
+        Cube currentCube = cubes[x, y];
+        if(currentCube.IsStatic() == false)
+        {
+            GameObject.Destroy(staticCubes[x, y].gameObject);
+        }
+        GameObject.Destroy(currentCube.gameObject);
+
+        cubes[x, y] = newCube;
+        if(newCube.IsStatic())
+        {
+            staticCubes[x, y] = newCube;
+        }
     }
 
     public void CreateNewLevel(int levelWidth, int levelHeight)
@@ -86,6 +248,7 @@ public class Scene
         levelRootObject = new GameObject("LevelRoot");
 
         cubes = new Cube[levelWidth, levelHeight];
+        staticCubes = new Cube[levelWidth, levelHeight];
 
         for(int i = 0; i < levelWidth; i++)
         {
@@ -97,6 +260,7 @@ public class Scene
                 newCube.scene = this;
 
                 cubes[i, j] = newCube;
+                staticCubes[i, j] = newCube;
 
                 newCube.transform.parent = levelRootObject.transform;
                 newCube.UpdateShaderProperties();
@@ -206,7 +370,7 @@ public class Scene
                         if(neighbourToMove == null || (
                             (neighbourToMove.IsStatic() == true || neighbourToMove.isMarkedToMove == true) && neighbourToMove.GetCubeType() != CubeType.Wall))
                         {
-                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(0.3f, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
+                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(currentCube.GetCubeType() == CubeType.Good ? 0.27f : 0.3f, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
                             allCoroutinesToWait.Add(newCoroutine);
                         }
                     }

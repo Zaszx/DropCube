@@ -28,6 +28,27 @@ public class EditCube : Cube
         base.UpdateShaderProperties();
     }
 
+    public override bool IsStatic()
+    {
+        if (cubeType == CubeType.Gray)
+        {
+            return true;
+        }
+        else if (cubeType == CubeType.Bad)
+        {
+            return false;
+        }
+        else if (cubeType == CubeType.Good)
+        {
+            return false;
+        }
+        else if (cubeType == CubeType.Wall)
+        {
+            return true;
+        }
+        return true;
+    }
+
     public override Color GetCubeColor()
     {
         if(cubeType == CubeType.Gray)
