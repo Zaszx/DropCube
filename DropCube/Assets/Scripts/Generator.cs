@@ -31,4 +31,9 @@ public class Generator : MonoBehaviour
 
         yield return null;
     }
+
+    public void Save()
+    {
+        scene.WriteLevel("Assets/Resources/Levels/level.xml");
+    }
 }

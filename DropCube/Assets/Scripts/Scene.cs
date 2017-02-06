@@ -42,6 +42,8 @@ public class Scene
 
     public Vector2[] possibleGravityDirections = new Vector2[4];
 
+    List<bool> solution;
+
     public Scene()
     {
         sceneStatus = SceneStatus.Idle;
@@ -92,101 +94,117 @@ public class Scene
 
     public void Generate(int complexity)
     {
-        Clear();
-        int gridSize = Random.Range(complexity / 4, complexity / 3);
-        CreateNewLevel(gridSize, gridSize);
-
-        // Create Holes
-        int holeCount = Random.Range(2, gridSize / 2);
-        for(int i = 0; i < holeCount; i++)
+        int movesRequired = -1;
+        while (true)
         {
-            bool holeInX = Random.value < 0.5f;
-            int randomValue = Random.Range(0, gridSize - 1);
-            bool holeInTop = Random.value < 0.5f;
 
-            int holeXIndex = 0;
-            int holeYIndex = 0;
+            Clear();
+            int gridSize = Random.Range(complexity / 4, complexity / 3);
+            CreateNewLevel(gridSize, gridSize);
 
-            if(holeInX)
+            // Create Holes
+            int holeCount = Random.Range(2, gridSize / 2);
+            for (int i = 0; i < holeCount; i++)
             {
-                holeXIndex = randomValue;
-                holeYIndex = holeInTop ? 0 : gridSize - 1;
-            }
-            else
-            {
-                holeXIndex = holeInTop ? 0 : gridSize - 1;
-                holeYIndex = randomValue;
-            }
+                bool holeInX = Random.value < 0.5f;
+                int randomValue = Random.Range(0, gridSize - 1);
+                bool holeInTop = Random.value < 0.5f;
 
-            Cube currentCube = cubes[holeXIndex, holeYIndex];
-            if(currentCube.GetCubeType() == CubeType.Gray)
-            {
-                i--;
-                continue;
-            }
+                int holeXIndex = 0;
+                int holeYIndex = 0;
 
-            Cube grayCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
-            grayCube.transform.position = new Vector3(holeXIndex, 0, holeYIndex);
-            ReplaceCubeWith(holeXIndex, holeYIndex, grayCube);
-        }
+                if (holeInX)
+                {
+                    holeXIndex = randomValue;
+                    holeYIndex = holeInTop ? 0 : gridSize - 1;
+                }
+                else
+                {
+                    holeXIndex = holeInTop ? 0 : gridSize - 1;
+                    holeYIndex = randomValue;
+                }
 
+                Cube currentCube = cubes[holeXIndex, holeYIndex];
+                if (currentCube.GetCubeType() == CubeType.Gray)
+                {
+                    i--;
+                    continue;
+                }
 
-        // Create cubes
-        int cubeCount = Random.Range(complexity / 10, complexity / 3);
-        cubeCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
-        for(int i = 0; i < cubeCount; i++)
-        {
-            int randomX = Random.Range(1, gridSize - 2);
-            int randomY = Random.Range(1, gridSize - 2);
-
-            Cube currentCube = cubes[randomX, randomY];
-            if(currentCube.GetCubeType() != CubeType.Gray)
-            {
-                i--;
-                continue;
+                Cube grayCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
+                grayCube.transform.position = new Vector3(holeXIndex, 0, holeYIndex);
+                ReplaceCubeWith(holeXIndex, holeYIndex, grayCube);
             }
 
-            bool badCube = (i == 0) || Random.value < 0.5f;
 
-            Cube cubeBelow = cubes[randomX, randomY + 1];
-            if(randomX == 1 && cubeBelow.GetCubeType() == CubeType.Gray)
+            // Create cubes
+            int cubeCount = Random.Range(complexity / 10, complexity / 3);
+            cubeCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
+            for (int i = 0; i < cubeCount; i++)
             {
-                i--;
-                continue;
+                int randomX = Random.Range(1, gridSize - 2);
+                int randomY = Random.Range(1, gridSize - 2);
+
+                Cube currentCube = cubes[randomX, randomY];
+                if (currentCube.GetCubeType() != CubeType.Gray)
+                {
+                    i--;
+                    continue;
+                }
+
+                bool badCube = (i == 0) || Random.value < 0.5f;
+
+                Cube cubeBelow = cubes[randomX, randomY + 1];
+                if (randomX == 1 && cubeBelow.GetCubeType() == CubeType.Gray)
+                {
+                    i--;
+                    continue;
+                }
+
+                if (cubeBelow.GetCubeType() == CubeType.Gray)
+                {
+                    Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
+                    wallCube.transform.position = new Vector3(randomX, 0, randomY + 1);
+                    ReplaceCubeWith(randomX, randomY + 1, wallCube);
+                }
+
+                Cube newCube = GameObject.Instantiate(badCube ? Prefabs.badCube : Prefabs.goodCube).GetComponent<Cube>();
+                newCube.transform.position = new Vector3(randomX, 0, randomY);
+                ReplaceCubeWith(randomX, randomY, newCube);
             }
 
-            if(cubeBelow.GetCubeType() == CubeType.Gray)
+
+            // Generate Walls
+            int wallCount = Random.Range(complexity / 10, complexity / 3);
+            wallCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
+            for (int i = 0; i < wallCount; i++)
             {
+                int randomX = Random.Range(1, gridSize - 2);
+                int randomY = Random.Range(1, gridSize - 2);
+
+                Cube currentCube = cubes[randomX, randomY];
+                if (currentCube.GetCubeType() != CubeType.Gray)
+                {
+                    i--;
+                    continue;
+                }
+
                 Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
-                wallCube.transform.position = new Vector3(randomX, 0, randomY + 1);
-                ReplaceCubeWith(randomX, randomY + 1, wallCube);
+                wallCube.transform.position = new Vector3(randomX, 0, randomY);
+                ReplaceCubeWith(randomX, randomY, wallCube); ;
             }
 
-            Cube newCube = GameObject.Instantiate(badCube ? Prefabs.badCube : Prefabs.goodCube).GetComponent<Cube>();
-            newCube.transform.position = new Vector3(randomX, 0, randomY);
-            ReplaceCubeWith(randomX, randomY, newCube);
-        }
-
-
-        // Generate Walls
-        int wallCount = Random.Range(complexity / 10, complexity / 3);
-        wallCount = Mathf.Min(cubeCount, (gridSize - 1) * (gridSize - 1) / 5);
-        for(int i = 0; i < wallCount; i++)
-        {
-            int randomX = Random.Range(1, gridSize - 2);
-            int randomY = Random.Range(1, gridSize - 2);
-
-            Cube currentCube = cubes[randomX, randomY];
-            if (currentCube.GetCubeType() != CubeType.Gray)
+            solution = new List<bool>();
+            int movesRequiredToSolve = GetMovesRequiredToSolve();
+            if(movesRequiredToSolve > 0)
             {
-                i--;
-                continue;
+                movesRequired = movesRequiredToSolve;
+                break;
             }
-
-            Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
-            wallCube.transform.position = new Vector3(randomX, 0, randomY);
-            ReplaceCubeWith(randomX, randomY, wallCube); ;
+            int aa = solution.Count;
         }
+
+        int a = 5;
     }
 
     public int GetMovesRequiredToSolve()
@@ -201,10 +219,10 @@ public class Scene
                 levelToInt[i, j] = cubes[i, j].GetCubeType();
             }
         }
-        while (currentDepth < 20 && solved == false)
+        while (currentDepth < 10 && solved == false)
         {
             currentDepth++;
-            solved = Dfs(0, currentDepth, levelToInt, Vector2.up);
+            solved = Dfs(0, currentDepth, levelToInt, Direction.Down, new List<bool>());
         }
         if(solved)
         {
@@ -213,15 +231,135 @@ public class Scene
         return -1;
     }
 
-    bool Dfs(int depth, int maxDepth, CubeType[,] cubes, Vector2 gravityDirection)
+    bool Dfs(int depth, int maxDepth, CubeType[,] cubes, Direction gravityDirection, List<bool> movements)
     {
         if(depth == maxDepth)
         {
             return false;
         }
 
+        List<bool> movementsClone = new List<bool>();
+        for(int i = 0; i < movements.Count; i++)
+        {
+            movementsClone.Add(movements[i]);
+        }
 
+        CubeType[,] cubesClone = new CubeType[levelWidth, levelHeight];
+        for(int i = 0; i < levelWidth; i++)
+        {
+            for(int j = 0; j < levelHeight; j++)
+            {
+                cubesClone[i,j] = cubes[i,j];
+            }
+        }
+
+        Vector2 currentDirection = possibleGravityDirections[(int)gravityDirection];
+        bool result = UpdateCubesWithGravityDirection(cubesClone, currentDirection);
+        if(result == false)
+        {
+            return false;
+        }
+
+        bool anyBadCube = false;
+
+        for (int i = 0; i < levelWidth; i++)
+        {
+            for (int j = 0; j < levelHeight; j++)
+            {
+                if(cubesClone[i,j] == CubeType.Bad)
+                {
+                    anyBadCube = true;
+                }
+            }
+        }
+
+        if(anyBadCube == false)
+        {
+            solution = movementsClone;
+            return true;
+        }
+
+        gravityDirection = (Direction)((int)(gravityDirection + 1 + 4) % 4);
+        currentDirection = possibleGravityDirections[(int)gravityDirection];
+
+        movementsClone.Add(true);
+
+        result = Dfs(depth + 1, maxDepth, cubesClone, gravityDirection, movementsClone);
+        if(result)
+        {
+            return true;
+        }
+
+        movementsClone.RemoveAt(movementsClone.Count - 1);
+        movementsClone.Add(false);
+
+        gravityDirection = (Direction)((int)(gravityDirection - 2 + 4) % 4);
+        currentDirection = possibleGravityDirections[(int)gravityDirection];
+
+        result = Dfs(depth + 1, maxDepth, cubesClone, gravityDirection, movementsClone);
+        if(result)
+        {
+            return true;
+        }
+
+
+        return false;
+    }
+
+    bool UpdateCubesWithGravityDirection(CubeType[,] cubes, Vector2 gravityDirection)
+    {
+        Vector2 realGravityDirection = gravityDirection;
+        Vector2 startingPosition = GetIterationBeginPoint(gravityDirection);
+        if (gravityDirection.x == 0) gravityDirection.x = -1;
+        if (gravityDirection.y == 0) gravityDirection.y = -1;
+        for(int i = Mathf.RoundToInt(startingPosition.x); (i < levelWidth && i >= 0); i = i - Mathf.RoundToInt(gravityDirection.x))
+        {
+            for(int j = Mathf.RoundToInt(startingPosition.y); (j < levelHeight && j >= 0); j = j - Mathf.RoundToInt(gravityDirection.y))
+            {
+                CubeType currentCubeType = cubes[i, j];
+                if(currentCubeType == CubeType.Bad || currentCubeType == CubeType.Good)
+                {
+                    Vector2 currentPosition = new Vector2(i, j);
+
+                    while(true)
+                    {
+                        currentPosition = currentPosition - gravityDirection;
+                        if(IsInBounds(currentPosition))
+                        {
+                            CubeType cubeType = cubes[Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)];
+                            if(cubeType != CubeType.Gray)
+                            {
+                                Vector2 newPosition = currentPosition + gravityDirection;
+                                cubes[i, j] = CubeType.Gray;
+                                cubes[Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.y)] = currentCubeType;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            cubes[i, j] = CubeType.Gray;
+                            if(currentCubeType == CubeType.Good)
+                            {
+                                return false;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         return true;
+    }
+
+    bool IsInBounds(Vector2 position)
+    {
+        int xpos = Mathf.RoundToInt(position.x);
+        int ypos = Mathf.RoundToInt(position.y);
+        if(xpos < levelWidth && xpos >= 0 && ypos < levelHeight && ypos >= 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     void ReplaceCubeWith(int x, int y, Cube newCube)
