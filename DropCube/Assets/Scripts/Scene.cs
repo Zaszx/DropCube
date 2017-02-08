@@ -42,7 +42,7 @@ public class Scene
 
     public Vector2[] possibleGravityDirections = new Vector2[4];
 
-    List<bool> solution;
+    public List<bool> solution;
 
     public Scene()
     {
@@ -52,6 +52,8 @@ public class Scene
         possibleGravityDirections[(int)Direction.Right] = Vector2.left;
         possibleGravityDirections[(int)Direction.Up] = Vector2.down;
         possibleGravityDirections[(int)Direction.Left] = Vector2.right;
+
+        gravityDirection = Direction.Down;
 
         ticksParent = GameObject.Find("TicksParent");
     }
@@ -92,7 +94,7 @@ public class Scene
         GameObject.Destroy(levelRootObject);
     }
 
-    public void Generate(int complexity)
+    public int Generate(int complexity)
     {
         int movesRequired = -1;
         while (true)
@@ -131,9 +133,7 @@ public class Scene
                     continue;
                 }
 
-                Cube grayCube = GameObject.Instantiate(Prefabs.grayCube).GetComponent<Cube>();
-                grayCube.transform.position = new Vector3(holeXIndex, 0, holeYIndex);
-                ReplaceCubeWith(holeXIndex, holeYIndex, grayCube);
+                ReplaceCubeWith(holeXIndex, holeYIndex, CubeType.Gray);
             }
 
 
@@ -163,14 +163,10 @@ public class Scene
 
                 if (cubeBelow.GetCubeType() == CubeType.Gray)
                 {
-                    Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
-                    wallCube.transform.position = new Vector3(randomX, 0, randomY + 1);
-                    ReplaceCubeWith(randomX, randomY + 1, wallCube);
+                    ReplaceCubeWith(randomX, randomY + 1, CubeType.Wall);
                 }
 
-                Cube newCube = GameObject.Instantiate(badCube ? Prefabs.badCube : Prefabs.goodCube).GetComponent<Cube>();
-                newCube.transform.position = new Vector3(randomX, 0, randomY);
-                ReplaceCubeWith(randomX, randomY, newCube);
+                ReplaceCubeWith(randomX, randomY, badCube ? CubeType.Bad : CubeType.Good);
             }
 
 
@@ -189,9 +185,7 @@ public class Scene
                     continue;
                 }
 
-                Cube wallCube = GameObject.Instantiate(Prefabs.wallCube).GetComponent<Cube>();
-                wallCube.transform.position = new Vector3(randomX, 0, randomY);
-                ReplaceCubeWith(randomX, randomY, wallCube); ;
+                ReplaceCubeWith(randomX, randomY, CubeType.Wall); ;
             }
 
             solution = new List<bool>();
@@ -204,7 +198,7 @@ public class Scene
             int aa = solution.Count;
         }
 
-        int a = 5;
+        return movesRequired;
     }
 
     public int GetMovesRequiredToSolve()
@@ -226,9 +220,58 @@ public class Scene
         }
         if(solved)
         {
-            return currentDepth;
+            return currentDepth - 1;
         }
         return -1;
+    }
+
+    public List<CubeType[,]> GetSolution()
+    {
+        List<CubeType[,]> solution = new List<CubeType[,]>();
+
+        CubeType[,] initialPosition = new CubeType[levelWidth, levelHeight];
+        for (int i = 0; i < levelWidth; i++)
+        {
+            for (int j = 0; j < levelHeight; j++)
+            {
+                initialPosition[i, j] = cubes[i, j].GetCubeType();
+            }
+        }
+
+        CubeType[,] positionClone = new CubeType[levelWidth, levelHeight];
+        for (int i = 0; i < levelWidth; i++)
+        {
+            for (int j = 0; j < levelHeight; j++)
+            {
+                positionClone[i, j] = cubes[i, j].GetCubeType();
+            }
+        }
+
+        solution.Add(positionClone);
+        Direction gravityDirection = Direction.Down;
+
+        foreach(bool move in this.solution)
+        {
+            if (move)
+            {
+                gravityDirection = (Direction)((int)(gravityDirection + 1 + 4) % 4);
+            }
+            else
+            {
+                gravityDirection = (Direction)((int)(gravityDirection - 1 + 4) % 4);
+            }
+            UpdateCubesWithGravityDirection(initialPosition, possibleGravityDirections[(int)gravityDirection]);
+            CubeType[,] clone = new CubeType[levelWidth, levelHeight];
+            for (int i = 0; i < levelWidth; i++)
+            {
+                for (int j = 0; j < levelHeight; j++)
+                {
+                    clone[i, j] = initialPosition[i,j];
+                }
+            }
+            solution.Add(clone);
+        }
+        return solution;
     }
 
     bool Dfs(int depth, int maxDepth, CubeType[,] cubes, Direction gravityDirection, List<bool> movements)
@@ -312,9 +355,13 @@ public class Scene
         Vector2 startingPosition = GetIterationBeginPoint(gravityDirection);
         if (gravityDirection.x == 0) gravityDirection.x = -1;
         if (gravityDirection.y == 0) gravityDirection.y = -1;
-        for(int i = Mathf.RoundToInt(startingPosition.x); (i < levelWidth && i >= 0); i = i - Mathf.RoundToInt(gravityDirection.x))
+        //         for(int i = Mathf.RoundToInt(startingPosition.x); (i < levelWidth && i >= 0); i = i - Mathf.RoundToInt(gravityDirection.x))
+        //         {
+        //             for(int j = Mathf.RoundToInt(startingPosition.y); (j < levelHeight && j >= 0); j = j - Mathf.RoundToInt(gravityDirection.y))
+        //             {
+        for (int i = (int)startingPosition.x; (i < levelWidth && i >= 0); i = i - (int)gravityDirection.x)
         {
-            for(int j = Mathf.RoundToInt(startingPosition.y); (j < levelHeight && j >= 0); j = j - Mathf.RoundToInt(gravityDirection.y))
+            for (int j = (int)startingPosition.y; (j < levelHeight && j >= 0); j = j - (int)gravityDirection.y)
             {
                 CubeType currentCubeType = cubes[i, j];
                 if(currentCubeType == CubeType.Bad || currentCubeType == CubeType.Good)
@@ -323,13 +370,13 @@ public class Scene
 
                     while(true)
                     {
-                        currentPosition = currentPosition - gravityDirection;
+                        currentPosition = currentPosition - realGravityDirection;
                         if(IsInBounds(currentPosition))
                         {
                             CubeType cubeType = cubes[Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)];
                             if(cubeType != CubeType.Gray)
                             {
-                                Vector2 newPosition = currentPosition + gravityDirection;
+                                Vector2 newPosition = currentPosition + realGravityDirection;
                                 cubes[i, j] = CubeType.Gray;
                                 cubes[Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.y)] = currentCubeType;
                                 break;
@@ -362,20 +409,22 @@ public class Scene
         return false;
     }
 
-    void ReplaceCubeWith(int x, int y, Cube newCube)
+    void ReplaceCubeWith(int x, int y, CubeType newCube)
     {
-        Cube currentCube = cubes[x, y];
-        if(currentCube.IsStatic() == false)
-        {
-            GameObject.Destroy(staticCubes[x, y].gameObject);
-        }
-        GameObject.Destroy(currentCube.gameObject);
-
-        cubes[x, y] = newCube;
-        if(newCube.IsStatic())
-        {
-            staticCubes[x, y] = newCube;
-        }
+        EditCube currentCube = cubes[x, y] as EditCube;
+        currentCube.cubeType = newCube;
+//         Cube currentCube = cubes[x, y];
+//         if(currentCube.IsStatic() == false)
+//         {
+//             GameObject.Destroy(staticCubes[x, y].gameObject);
+//         }
+//         GameObject.Destroy(currentCube.gameObject);
+// 
+//         cubes[x, y] = newCube;
+//         if(newCube.IsStatic())
+//         {
+//             staticCubes[x, y] = newCube;
+//         }
     }
 
     public void CreateNewLevel(int levelWidth, int levelHeight)
@@ -869,7 +918,14 @@ public class Scene
             {
                 XmlNode cubeNode = xmlDocument.CreateElement("cube");
                 XmlAttribute typeAttribute = xmlDocument.CreateAttribute("type");
-                typeAttribute.Value = (cubes[i, j] as EditCube).cubeType.ToString();
+                if(cubes[i,j] is EditCube)
+                {
+                    typeAttribute.Value = (cubes[i, j] as EditCube).cubeType.ToString();
+                }
+                else
+                {
+                    typeAttribute.Value = (cubes[i, j].GetCubeType().ToString());
+                }
                 cubeNode.Attributes.Append(typeAttribute);
 
                 cubesNode.AppendChild(cubeNode);

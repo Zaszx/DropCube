@@ -145,10 +145,10 @@ public class EditingManager : MonoBehaviour
         screenshotPath = screenshotPath + "/ss.png";
     }
 
-    public void SaveButtonClicked()
+    public static void SaveLevel(Scene scene, string scenePath, string screenshotPath)
     {
-        scene.WriteLevel(lastOpenedScenePath);
-        
+        scene.WriteLevel(scenePath);
+
         Bounds b = scene.sceneBounds;
         Camera cam = Camera.main;
 
@@ -158,7 +158,7 @@ public class EditingManager : MonoBehaviour
         Vector3 rectSize = edgeScreenPoint - centerScreenPoint;
 
         Rect ScrRect = new Rect(centerScreenPoint, rectSize);
-        
+
         //Construct a rect
         //Rect ScrRect = Rect.MinMaxRect(b.center.x - b.extents.x, b.center.y - b.extents.y, b.center.x + b.extents.x, b.center.y + b.extents.y);
         Debug.Log("Rect: " + ScrRect);
@@ -192,6 +192,10 @@ public class EditingManager : MonoBehaviour
         // This is another planar mesh in the view so I can see the captured image
         byte[] fileBytes = snapShot.EncodeToPNG();
         File.WriteAllBytes(screenshotPath, fileBytes);
+    }
 
+    public void SaveButtonClicked()
+    {
+        SaveLevel(scene, lastOpenedScenePath, screenshotPath);
     }
 }
