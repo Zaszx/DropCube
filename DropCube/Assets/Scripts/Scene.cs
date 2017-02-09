@@ -370,13 +370,13 @@ public class Scene
 
                     while(true)
                     {
-                        currentPosition = currentPosition - realGravityDirection;
+                        currentPosition = currentPosition + realGravityDirection;
                         if(IsInBounds(currentPosition))
                         {
                             CubeType cubeType = cubes[Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)];
                             if(cubeType != CubeType.Gray)
                             {
-                                Vector2 newPosition = currentPosition + realGravityDirection;
+                                Vector2 newPosition = currentPosition - realGravityDirection;
                                 cubes[i, j] = CubeType.Gray;
                                 cubes[Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.y)] = currentCubeType;
                                 break;

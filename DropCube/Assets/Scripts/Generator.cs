@@ -36,11 +36,11 @@ public class Generator : MonoBehaviour
         {
             if(move)
             {
-                solutionText.text = solutionText.text + "\nLeft";
+                solutionText.text = solutionText.text + "\nRight";
             }
             else
             {
-                solutionText.text = solutionText.text + "\nRight";
+                solutionText.text = solutionText.text + "\nLeft";
             }
         }
 
@@ -50,9 +50,9 @@ public class Generator : MonoBehaviour
 
         foreach(CubeType[,] move in solution)
         {
-            for(int i = 0; i < scene.levelWidth; i++)
+            for(int j = 0; j < scene.levelHeight; j++)
             {
-                for(int j = 0; j < scene.levelHeight; j++)
+                for(int i = scene.levelWidth - 1; i >= 0; i--)
                 {
                     solutionString = solutionString + (int)move[i, j] + " ";
                 }
