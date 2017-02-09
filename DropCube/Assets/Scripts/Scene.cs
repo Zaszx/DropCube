@@ -528,6 +528,8 @@ public class Scene
 
         yield return new WaitForEndOfFrame();
 
+        UpdateGridFromCubePositions();
+
         Dictionary<Cube, Vector3> cubeOriginalPositions = new Dictionary<Cube, Vector3>();
         foreach(Cube c in dynamicCubes)
         {
@@ -542,63 +544,63 @@ public class Scene
         if (iterationAmount.x == 0) iterationAmount.x = -1;
         if (iterationAmount.y == 0) iterationAmount.y = -1;
         Vector2 iterationBeginPoint = GetIterationBeginPoint(gravityInVec2);
-        int iterationCount = 0;
-        while(true)
+
+        float goodCubeFallUnitTime = 0.19f;
+        float badCubeFallUnitTime = 0.2f;
+
+        List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
+        for(int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
         {
-            List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
-            for(int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
+            for (int j = (int)iterationBeginPoint.y; (j < levelHeight && j >= 0); j = j - (int)iterationAmount.y)
             {
-                for (int j = (int)iterationBeginPoint.y; (j < levelHeight && j >= 0); j = j - (int)iterationAmount.y)
+                Cube currentCube = cubes[i, j];
+                if(currentCube.IsStatic() == false)
                 {
-                    Cube currentCube = cubes[i, j];
-                    if(currentCube.IsStatic() == false)
+                    Vector2 currentPosition = new Vector2(i, j);
+
+                    while (true)
                     {
-                        Cube neighbourToMove = GetCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y));
-                        if(neighbourToMove == null || (
-                            (neighbourToMove.IsStatic() == true || neighbourToMove.isMarkedToMove == true) && neighbourToMove.GetCubeType() != CubeType.Wall))
+                        currentPosition = currentPosition + gravityInVec2;
+                        if (IsInBounds(currentPosition))
                         {
-                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(currentCube.GetCubeType() == CubeType.Good ? 0.27f : 0.3f, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
-                            allCoroutinesToWait.Add(newCoroutine);
+                            Cube cubeToMove = cubes[Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)];
+                            if (cubeToMove.GetCubeType() != CubeType.Gray)
+                            {
+                                Vector2 targetPositionVec2 = currentPosition - gravityInVec2;
+                                Vector3 targetPosition = new Vector3(targetPositionVec2.x, 0.01f, targetPositionVec2.y);
+                                float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
+                                fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
+                                Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
+                                allCoroutinesToWait.Add(newCoroutine);
+
+                                cubes[i, j] = staticCubes[i, j];
+                                cubes[(int)targetPositionVec2.x, (int)targetPositionVec2.y] = currentCube;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            cubes[i, j] = staticCubes[i, j];
+                            Vector2 targetPositionVec2 = currentPosition;
+                            Vector3 targetPosition = new Vector3(targetPositionVec2.x, 0.01f, targetPositionVec2.y);
+                            float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
+                            fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
+                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, null));
+
+                            break;
                         }
                     }
+
                 }
             }
-
-            for (int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
-            {
-                for (int j = (int)iterationBeginPoint.y; (j < levelHeight && j >= 0); j = j - (int)iterationAmount.y)
-                {
-                    int ii = i;
-                    int jj = j;
-                    Cube currentCube = cubes[i, j];
-                    if (currentCube.isMarkedToMove)
-                    {
-                        Debug.Log(currentCube.name);
-                        cubes[i, j] = staticCubes[i, j];
-                        Cube neighbourToMove = GetCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y));
-                        if (neighbourToMove != null)
-                        {
-                            cubes[(int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y)] = currentCube;
-                            Debug.Log(new Vector2((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y)) + " REPLACED WITH " + new Vector2(i, j));
-                        }
-                    }
-                }
-            }
-
-            if (allCoroutinesToWait.Count == 0)
-            {
-                break;
-            }
-            else
-            {
-                foreach(Coroutine c in allCoroutinesToWait)
-                {
-                    yield return c;
-                }
-            }
-
-            iterationCount++;
         }
+
+        foreach (Coroutine c in allCoroutinesToWait)
+        {
+            yield return c;
+        }
+
+        UpdateGridFromCubePositions();
 
         SceneUndoData newUndoData = new SceneUndoData();
         foreach(Cube c in dynamicCubes)

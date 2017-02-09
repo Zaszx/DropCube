@@ -63,14 +63,13 @@ public class Cube : MonoBehaviour
         scene.OnCubeFallsDown(this);
     }
 
-    public IEnumerator MoveCoroutine(float totalTime, Cube targetCube)
+    public IEnumerator MoveCoroutine(float totalTime, Vector3 targetPosition, Cube targetCube)
     {
         isMarkedToMove = true;
 
         Vector3 moveDirection = Vector3.forward;
 
         Vector3 initialPosition = transform.position;
-        Vector3 targetPosition = initialPosition + moveDirection;
 
         float accumulatedTime = 0.0f;
 
