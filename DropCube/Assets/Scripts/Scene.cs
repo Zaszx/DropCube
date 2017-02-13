@@ -500,6 +500,28 @@ public class Scene
 
     }
 
+
+    private void AddUndoData(Dictionary<Cube, Vector3> cubeOriginalPositions, bool clockwise)
+    {
+        SceneUndoData newUndoData = new SceneUndoData();
+        foreach (Cube c in dynamicCubes)
+        {
+            Vector3 cubeInitialPosition = c.transform.position;
+            if (c.transform.position != cubeOriginalPositions[c])
+            {
+                CubeUndoData currentCubeData = new CubeUndoData();
+                currentCubeData.cube = c;
+                currentCubeData.fellDown = c.isActiveAndEnabled;
+                currentCubeData.startPosition = cubeOriginalPositions[c];
+                currentCubeData.endPosition = c.transform.position;
+
+                newUndoData.cubeData.Add(currentCubeData);
+            }
+        }
+        newUndoData.isRotationClockwise = clockwise;
+        undoManager.AddData(newUndoData);
+    }
+
     public IEnumerator RotateCoroutine(bool clockwise)
     {
         sceneStatus = SceneStatus.Rotating;
@@ -545,7 +567,7 @@ public class Scene
         if (iterationAmount.y == 0) iterationAmount.y = -1;
         Vector2 iterationBeginPoint = GetIterationBeginPoint(gravityInVec2);
 
-        float goodCubeFallUnitTime = 0.19f;
+        float goodCubeFallUnitTime = 0.195f;
         float badCubeFallUnitTime = 0.2f;
 
         List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
@@ -586,6 +608,7 @@ public class Scene
                             float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
                             fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
                             Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, null));
+                            allCoroutinesToWait.Add(newCoroutine);
 
                             break;
                         }
@@ -602,22 +625,7 @@ public class Scene
 
         UpdateGridFromCubePositions();
 
-        SceneUndoData newUndoData = new SceneUndoData();
-        foreach(Cube c in dynamicCubes)
-        {
-            if(c.transform.position != cubeOriginalPositions[c])
-            {
-                CubeUndoData currentCubeData = new CubeUndoData();
-                currentCubeData.cube = c;
-                currentCubeData.fellDown = c.isActiveAndEnabled;
-                currentCubeData.startPosition = cubeOriginalPositions[c];
-                currentCubeData.endPosition = c.transform.position;
-
-                newUndoData.cubeData.Add(currentCubeData);
-            }
-        }
-        newUndoData.isRotationClockwise = clockwise;
-        undoManager.AddData(newUndoData);
+        AddUndoData(cubeOriginalPositions, clockwise);
 
         if (sceneStatus != SceneStatus.Errored)
         {
