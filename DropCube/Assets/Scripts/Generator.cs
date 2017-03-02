@@ -9,6 +9,7 @@ public class Generator : MonoBehaviour
     public Scene scene;
     public Slider complexitySlider;
     public Text solutionText;
+    public InputField sceneNameField;
 
 	void Start () 
     {
@@ -67,6 +68,14 @@ public class Generator : MonoBehaviour
 
     public void Save()
     {
-        EditingManager.SaveLevel(scene, "Assets/Resources/Levels/level.xml", "Assets/Resources/Levels/ss.png");
+        string folderPath = "Assets/Resources/Levels/" + sceneNameField.text + "/";
+        if(Directory.Exists(folderPath) == false)
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        string xmlPath = folderPath + "level.xml";
+        string ssPath = folderPath + "ss.png";
+        EditingManager.SaveLevel(scene, xmlPath, ssPath);
     }
 }
