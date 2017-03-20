@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
         levels.Add(new Level("Levels/level20"));
         levels.Add(new Level("Levels/level21"));
         levels.Add(new Level("Levels/level22"));
-        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/level23"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
         levels.Add(new Level("Levels/testLevel"));
