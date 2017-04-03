@@ -31,6 +31,60 @@ public class SwipeData
         isSingleClick = false;
     }
 
+    public bool IsSwipeClockwise(Vector2 swipeDirection, Vector2 sceneCenter, Vector2 averageSwipePosition)
+    {
+        bool clockwise = false;
+
+
+        if (averageSwipePosition.y < sceneCenter.y)
+        {
+            if (swipeDirection == Vector2.right)
+            {
+                clockwise = false;
+            }
+            else if (swipeDirection == Vector2.left)
+            {
+                clockwise = true;
+            }
+        }
+        else
+        {
+            if (swipeDirection == Vector2.right)
+            {
+                clockwise = true;
+            }
+            else if (swipeDirection == Vector2.left)
+            {
+                clockwise = false;
+            }
+        }
+
+        if (averageSwipePosition.x < sceneCenter.x)
+        {
+            if (swipeDirection == Vector2.up)
+            {
+                clockwise = true;
+            }
+            else if (swipeDirection == Vector2.down)
+            {
+                clockwise = false;
+            }
+        }
+        else
+        {
+            if (swipeDirection == Vector2.up)
+            {
+                clockwise = false;
+            }
+            else if (swipeDirection == Vector2.down)
+            {
+                clockwise = true;
+            }
+        }
+
+        return clockwise;
+    }
+
     public void Tick()
     {
         if(swipeStatus == SwipeStatus.Idle && Input.GetMouseButtonDown(0))

@@ -44,6 +44,8 @@ public class Scene
 
     public List<bool> solution;
 
+    public Vector2 sceneCenterOnScreen;
+
     public Scene()
     {
         sceneStatus = SceneStatus.Idle;
@@ -493,6 +495,7 @@ public class Scene
         Camera.main.transform.rotation = Quaternion.Euler(90, 180, 0);
 
         cameraPosition = Camera.main.transform.position;
+        sceneCenterOnScreen = Camera.main.WorldToScreenPoint(sceneBounds.center);
     }
 
     public void Tick()
@@ -567,7 +570,7 @@ public class Scene
         if (iterationAmount.y == 0) iterationAmount.y = -1;
         Vector2 iterationBeginPoint = GetIterationBeginPoint(gravityInVec2);
 
-        float goodCubeFallUnitTime = 0.195f;
+        float goodCubeFallUnitTime = 0.2f;
         float badCubeFallUnitTime = 0.2f;
 
         List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
@@ -592,7 +595,7 @@ public class Scene
                                 Vector3 targetPosition = new Vector3(targetPositionVec2.x, 0.01f, targetPositionVec2.y);
                                 float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
                                 fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
-                                Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
+                                Coroutine newCoroutine = StaticCoroutine.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, GetStaticCubeWithIndex((int)(i + gravityInVec2.x), (int)(j + gravityInVec2.y))));
                                 allCoroutinesToWait.Add(newCoroutine);
 
                                 cubes[i, j] = staticCubes[i, j];
@@ -607,7 +610,11 @@ public class Scene
                             Vector3 targetPosition = new Vector3(targetPositionVec2.x, 0.01f, targetPositionVec2.y);
                             float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
                             fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
-                            Coroutine newCoroutine = gameManager.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, null));
+                            if(currentCube.GetCubeType() == CubeType.Good)
+                            {
+                                sceneStatus = SceneStatus.Errored;
+                            }
+                            Coroutine newCoroutine = StaticCoroutine.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, null));
                             allCoroutinesToWait.Add(newCoroutine);
 
                             break;
@@ -653,7 +660,7 @@ public class Scene
                 if(cubeData.fallAmount == i)
                 {
                     cubeData.cube.gameObject.SetActive(true);
-                    Coroutine c = gameManager.StartCoroutine(cubeData.cube.MoveTo(cubeData.startPosition, waitAmount * i));
+                    Coroutine c = StaticCoroutine.StartCoroutine(cubeData.cube.MoveTo(cubeData.startPosition, waitAmount * i));
                     allCoroutinesToWait.Add(c);
                 }
             }
@@ -768,7 +775,10 @@ public class Scene
 
     public void WinLevel()
     {
-        gameManager.OnLevelFinished(0);
+        if(gameManager != null)
+        {
+            gameManager.OnLevelFinished(0);
+        }
     }
 
     public void OnCubeFallsDown(Cube cube)
@@ -791,12 +801,12 @@ public class Scene
             }
             if(andBadCubeLeft == false && sceneStatus != SceneStatus.Errored)
             {
-                gameManager.StopAllCoroutines();
+                StaticCoroutine.StopAllCoroutines();
                 WinLevel();
             }
-            else
+            else if(gameManager != null)
             {
-                gameManager.StartCoroutine(CreateTick(cubeLastPosition));
+                StaticCoroutine.StartCoroutine(CreateTick(cubeLastPosition));
             }
         }
     }

@@ -56,32 +56,32 @@ public class GameManager : MonoBehaviour
         levels.Add(new Level("Levels/level21"));
         levels.Add(new Level("Levels/level22"));
         levels.Add(new Level("Levels/level23"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
-        levels.Add(new Level("Levels/testLevel"));
+        levels.Add(new Level("Levels/level24"));
+        levels.Add(new Level("Levels/level25"));
+        levels.Add(new Level("Levels/level26"));
+        levels.Add(new Level("Levels/level27"));
+        levels.Add(new Level("Levels/level28"));
+        levels.Add(new Level("Levels/level29"));
+        levels.Add(new Level("Levels/level30"));
+        levels.Add(new Level("Levels/level31"));
+        levels.Add(new Level("Levels/level32"));
+        levels.Add(new Level("Levels/level33"));
+        levels.Add(new Level("Levels/level34"));
+        levels.Add(new Level("Levels/level35"));
+        levels.Add(new Level("Levels/level36"));
+        levels.Add(new Level("Levels/level37"));
+        levels.Add(new Level("Levels/level38"));
+        levels.Add(new Level("Levels/level39"));
+        levels.Add(new Level("Levels/level40"));
+        levels.Add(new Level("Levels/level41"));
+        levels.Add(new Level("Levels/level42"));
+        levels.Add(new Level("Levels/level43"));
+        levels.Add(new Level("Levels/level44"));
+        levels.Add(new Level("Levels/level45"));
+        levels.Add(new Level("Levels/level46"));
+        levels.Add(new Level("Levels/level47"));
+        levels.Add(new Level("Levels/level48"));
+        levels.Add(new Level("Levels/level49"));
     }
 
     void Start () 
@@ -122,6 +122,7 @@ public class GameManager : MonoBehaviour
         scene.gameManager = this;
         scene.ReadLevel(levels[openLevelIndex], "", false);
         gameState = GameState.Game;
+        swipeData.Reset();
     }
 
     public void OnLevelButtonClicked(Level level)
@@ -133,6 +134,7 @@ public class GameManager : MonoBehaviour
         menuManager.SetVisible(false);
 
         openLevelIndex = levels.IndexOf(level);
+        swipeData.Reset();
     }
 
     public Vector2 GetDigitalDirectionFromAnalog(Vector2 analogDirection)
@@ -180,13 +182,12 @@ public class GameManager : MonoBehaviour
                 {
                     Vector2 resultSwipe = swipeData.resultSwipe;
                     Vector2 swipeDirection = GetDigitalDirectionFromAnalog(resultSwipe);
-                    bool isRotating = (swipeDirection == Vector2.left || swipeDirection == Vector2.right);
-                    if (isRotating)
-                    {
-                        StartCoroutine(scene.RotateCoroutine(swipeDirection == Vector2.right));
-                    }
-                }
+                    Vector2 averageSwipePosition = (swipeData.startPosition + swipeData.endPosition) * 0.5f;
 
+                    bool clockwise = swipeData.IsSwipeClockwise(swipeDirection, scene.sceneCenterOnScreen, averageSwipePosition);
+
+                    StartCoroutine(scene.RotateCoroutine(clockwise));
+                }
                 swipeData.Reset();
             }
 

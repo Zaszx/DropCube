@@ -81,6 +81,12 @@ public class EditingManager : MonoBehaviour
         scenePathText.text = lastOpenedScenePath;
     }
 
+    public void SolveClicked()
+    {
+        scene.GetMovesRequiredToSolve();
+        int a = 5;
+    }
+
     EditCube GetCubeUnderMouse()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
