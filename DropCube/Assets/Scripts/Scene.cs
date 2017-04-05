@@ -46,6 +46,8 @@ public class Scene
 
     public Vector2 sceneCenterOnScreen;
 
+    public bool moveContainsError;
+
     public Scene()
     {
         sceneStatus = SceneStatus.Idle;
@@ -58,6 +60,8 @@ public class Scene
         gravityDirection = Direction.Down;
 
         ticksParent = GameObject.Find("TicksParent");
+
+        moveContainsError = false;
     }
 
     public void Clear()
@@ -93,6 +97,7 @@ public class Scene
         cubes = null;
         levelWidth = 0;
         levelHeight = 0;
+        moveContainsError = false;
         GameObject.Destroy(levelRootObject);
     }
 
@@ -573,6 +578,9 @@ public class Scene
         float goodCubeFallUnitTime = 0.2f;
         float badCubeFallUnitTime = 0.2f;
 
+        int minGoodCubeFallDistance = 1000;
+        int maxBadCubeFallDistance = 0;
+
         List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
         for(int i = (int)iterationBeginPoint.x; (i < levelWidth && i >= 0); i = i - (int)iterationAmount.x)
         {
@@ -609,10 +617,15 @@ public class Scene
                             Vector2 targetPositionVec2 = currentPosition;
                             Vector3 targetPosition = new Vector3(targetPositionVec2.x, 0.01f, targetPositionVec2.y);
                             float fallTime = currentCube.GetCubeType() == CubeType.Good ? goodCubeFallUnitTime : badCubeFallUnitTime;
-                            fallTime = fallTime * Vector2.Distance(targetPositionVec2, new Vector2(i, j));
+                            int distance = Mathf.RoundToInt(Vector2.Distance(targetPositionVec2, new Vector2(i, j)));
+                            fallTime = fallTime * distance;
                             if(currentCube.GetCubeType() == CubeType.Good)
                             {
-                                sceneStatus = SceneStatus.Errored;
+                                minGoodCubeFallDistance = Mathf.Min(minGoodCubeFallDistance, distance);
+                            }
+                            else
+                            {
+                                maxBadCubeFallDistance = Mathf.Max(maxBadCubeFallDistance, distance);
                             }
                             Coroutine newCoroutine = StaticCoroutine.StartCoroutine(currentCube.MoveCoroutine(fallTime, targetPosition, null));
                             allCoroutinesToWait.Add(newCoroutine);
@@ -623,6 +636,11 @@ public class Scene
 
                 }
             }
+        }
+
+        if(minGoodCubeFallDistance <= maxBadCubeFallDistance)
+        {
+            moveContainsError = true;
         }
 
         foreach (Coroutine c in allCoroutinesToWait)
@@ -638,6 +656,8 @@ public class Scene
         {
             sceneStatus = SceneStatus.Idle;
         }
+
+        moveContainsError = false;
     }
 
     public IEnumerator UndoCoroutine()
@@ -791,22 +811,25 @@ public class Scene
         {
             Vector3 cubeLastPosition = cube.transform.position;
             cube.gameObject.SetActive(false);
-            bool andBadCubeLeft = false;
-            foreach(Cube c in dynamicCubes)
+            if(moveContainsError == false)
             {
-                if(c.isActiveAndEnabled && c.GetCubeType() == CubeType.Bad)
+                bool andBadCubeLeft = false;
+                foreach (Cube c in dynamicCubes)
                 {
-                    andBadCubeLeft = true;
+                    if (c.isActiveAndEnabled && c.GetCubeType() == CubeType.Bad)
+                    {
+                        andBadCubeLeft = true;
+                    }
                 }
-            }
-            if(andBadCubeLeft == false && sceneStatus != SceneStatus.Errored)
-            {
-                StaticCoroutine.StopAllCoroutines();
-                WinLevel();
-            }
-            else if(gameManager != null)
-            {
-                StaticCoroutine.StartCoroutine(CreateTick(cubeLastPosition));
+                if (andBadCubeLeft == false && sceneStatus != SceneStatus.Errored)
+                {
+                    StaticCoroutine.StopAllCoroutines();
+                    WinLevel();
+                }
+//                 else if (gameManager != null)
+//                 {
+//                     StaticCoroutine.StartCoroutine(CreateTick(cubeLastPosition));
+//                 }
             }
         }
     }

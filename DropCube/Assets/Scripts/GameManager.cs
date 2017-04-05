@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     public GameState gameState;
 
     public Button undoButton;
+    public Button restartButton;
     public Button menuButton;
 
     public SaveData saveData = new SaveData();
@@ -127,6 +128,10 @@ public class GameManager : MonoBehaviour
 
     public void OnLevelButtonClicked(Level level)
     {
+        if(scene != null)
+        {
+            scene.Clear();
+        }
         scene = new Scene();
         scene.gameManager = this;
         scene.ReadLevel(level, "", false);
@@ -171,6 +176,7 @@ public class GameManager : MonoBehaviour
 
         if(gameState == GameState.Game)
         {
+            restartButton.gameObject.SetActive(true);
             undoButton.gameObject.SetActive(true);
             menuButton.gameObject.SetActive(true);
 
@@ -208,6 +214,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            restartButton.gameObject.SetActive(false);
             undoButton.gameObject.SetActive(false);
             menuButton.gameObject.SetActive(false);
         }
@@ -217,6 +224,11 @@ public class GameManager : MonoBehaviour
     public void UndoButtonClicked()
     {
         StartCoroutine(scene.UndoCoroutine());
+    }
+
+    public void RestartButtonClicked()
+    {
+        OnLevelButtonClicked(levels[openLevelIndex]);
     }
 
     public void MenuButtonClicked()
