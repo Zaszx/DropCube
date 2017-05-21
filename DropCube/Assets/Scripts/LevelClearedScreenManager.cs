@@ -20,10 +20,6 @@ public class LevelClearedScreenManager
         nextLevelButton = GameObject.Find("NextLevelButton").GetComponent<Button>();
         menuButton = GameObject.Find("MenuButton").GetComponent<Button>();
 
-        starImages[0] = GameObject.Find("Star0").GetComponent<Image>();
-        starImages[1] = GameObject.Find("Star1").GetComponent<Image>();
-        starImages[2] = GameObject.Find("Star2").GetComponent<Image>();
-
         menuButton.onClick.AddListener(MenuButtonClicked);
         nextLevelButton.onClick.AddListener(NextLevelButtonClicked);
 
