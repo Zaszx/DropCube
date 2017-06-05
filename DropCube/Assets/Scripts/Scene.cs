@@ -65,6 +65,7 @@ public class Scene
 
         ticksParent = GameObject.Find("TicksParent");
         backgroundImage = GameObject.Find("Background").GetComponent<Image>();
+        backgroundImage.sprite = Prefabs.playScreens[0];
 
         screenIndex = 0;
 
@@ -805,6 +806,7 @@ public class Scene
         if(gameManager != null)
         {
             backgroundImage.sprite = Prefabs.clearScreen;
+            levelRootObject.gameObject.SetActive(false);
             gameManager.OnLevelFinished(0);
         }
     }

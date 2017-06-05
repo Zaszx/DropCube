@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
 
     List<Level> levels = new List<Level>();
     MenuManager menuManager = new MenuManager();
-    LevelClearedScreenManager levelClearedScreenManager = new LevelClearedScreenManager();
 
     int openLevelIndex;
     int maxOpenLevel;
@@ -27,6 +26,7 @@ public class GameManager : MonoBehaviour
 
     public Button undoButton;
     public Button menuButton;
+    public Button nextLevelButton;
 
     public SaveData saveData = new SaveData();
 
@@ -93,10 +93,11 @@ public class GameManager : MonoBehaviour
         maxOpenLevel = saveData.level;
 
         menuManager.InitMenu(this, levels, maxOpenLevel);
-        levelClearedScreenManager.Init(this);
         OpenMenu();
 
         openLevelIndex = 0;
+
+        nextLevelButton.gameObject.SetActive(false);
 
         //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
 	}
@@ -166,7 +167,6 @@ public class GameManager : MonoBehaviour
     public void OnLevelFinished(int starCount)
     {
         gameState = GameState.LevelCleared;
-        levelClearedScreenManager.OnLevelCleared(starCount);
     }
 
     void Update () 
@@ -208,11 +208,19 @@ public class GameManager : MonoBehaviour
                 bool undoAllowed = (scene.sceneStatus == SceneStatus.Idle || scene.sceneStatus == SceneStatus.Errored) && scene.undoManager.doneOperations.Count > 0;
                 undoButton.interactable = undoAllowed;
             }
-
+            nextLevelButton.gameObject.SetActive(false);
+            menuButton.gameObject.SetActive(true);
         }
-        else
+        else if(gameState == GameState.LevelCleared)
         {
             undoButton.gameObject.SetActive(false);
+            nextLevelButton.gameObject.SetActive(true);
+            menuButton.gameObject.SetActive(true);
+        }
+        else if(gameState == GameState.Menu)
+        {
+            undoButton.gameObject.SetActive(false);
+            nextLevelButton.gameObject.SetActive(false);
             menuButton.gameObject.SetActive(false);
         }
 
@@ -226,6 +234,11 @@ public class GameManager : MonoBehaviour
     public void RestartButtonClicked()
     {
         OnLevelButtonClicked(levels[openLevelIndex]);
+    }
+
+    public void NextLevelButtonClicked()
+    {
+        OnLevelButtonClicked(levels[openLevelIndex + 1]);
     }
 
     public void MenuButtonClicked()
