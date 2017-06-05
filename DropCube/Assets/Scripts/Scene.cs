@@ -19,6 +19,7 @@ public enum SceneStatus
     Undoing,
     Rotating,
     Moving,
+    Unloading,
     Errored,
 }
 
@@ -54,7 +55,7 @@ public class Scene
 
     public Scene()
     {
-        sceneStatus = SceneStatus.Idle;
+        sceneStatus = SceneStatus.Loading;
 
         possibleGravityDirections[(int)Direction.Down] = Vector2.up;
         possibleGravityDirections[(int)Direction.Right] = Vector2.left;
@@ -542,7 +543,7 @@ public class Scene
     {
         sceneStatus = SceneStatus.Rotating;
 
-        float totalTime = 1.0f;
+        float totalTime = 0.3f;
         float accumulatedTime = 0.0f;
 
         Quaternion initialRotation = levelRootObject.transform.rotation;
@@ -583,8 +584,8 @@ public class Scene
         if (iterationAmount.y == 0) iterationAmount.y = -1;
         Vector2 iterationBeginPoint = GetIterationBeginPoint(gravityInVec2);
 
-        float goodCubeFallUnitTime = 0.2f;
-        float badCubeFallUnitTime = 0.2f;
+        float goodCubeFallUnitTime = 0.1f;
+        float badCubeFallUnitTime = 0.1f;
 
         int minGoodCubeFallDistance = 1000;
         int maxBadCubeFallDistance = 0;
@@ -682,7 +683,7 @@ public class Scene
             maxFallAmount = Mathf.Max(maxFallAmount, cubeData.fallAmount);
         }
 
-        float waitAmount = 0.1f;
+        float waitAmount = 0.05f;
         List<Coroutine> allCoroutinesToWait = new List<Coroutine>();
         for(int i = maxFallAmount; i > 0; i--)
         {
@@ -703,7 +704,7 @@ public class Scene
             yield return c;
         }
 
-        float totalTime = 0.3f;
+        float totalTime = 0.2f;
         float accumulatedTime = 0.0f;
 
         Quaternion initialRotation = levelRootObject.transform.rotation;
@@ -804,12 +805,18 @@ public class Scene
 
     }
 
-    public void WinLevel()
+    public IEnumerator WinLevel()
     {
-        if(gameManager != null)
+        sceneStatus = SceneStatus.Unloading;
+        backgroundImage.sprite = Prefabs.clearScreen;
+
+        Coroutine c = StaticCoroutine.StartCoroutine(LoadLevelCoroutine(false));
+        yield return c;
+
+        levelRootObject.gameObject.SetActive(false);
+
+        if (gameManager != null)
         {
-            backgroundImage.sprite = Prefabs.clearScreen;
-            levelRootObject.gameObject.SetActive(false);
             gameManager.OnLevelFinished(0);
         }
     }
@@ -848,7 +855,7 @@ public class Scene
                 if (andBadCubeLeft == false && sceneStatus != SceneStatus.Errored)
                 {
                     StaticCoroutine.StopAllCoroutines();
-                    WinLevel();
+                    StaticCoroutine.StartCoroutine(WinLevel());
                 }
 //                 else if (gameManager != null)
 //                 {
@@ -993,7 +1000,24 @@ public class Scene
         sceneBounds.Encapsulate(new Vector3(levelWidth - 0.5f, 0, levelWidth - 0.5f));
 
         ComputeCameraPosition();
+        sceneStatus = SceneStatus.Loading;
+        levelRootObject.transform.localScale = Vector3.zero;
+        StaticCoroutine.StartCoroutine(LoadLevelCoroutine(true));
+    }
 
+    public IEnumerator LoadLevelCoroutine(bool load)
+    {
+        float totalTime = 0.5f;
+        float currentTime = 0.0f;
+
+        while(currentTime < totalTime)
+        {
+            levelRootObject.transform.localScale = Vector3.Lerp(/*levelRootObject.transform.localScale*/ load ? Vector3.zero : Vector3.one, load ? Vector3.one : Vector3.zero, currentTime / totalTime);
+            yield return new WaitForEndOfFrame();
+            currentTime = currentTime + Time.deltaTime;
+        }
+
+        levelRootObject.transform.localScale = load ? Vector3.one : Vector3.zero;
         sceneStatus = SceneStatus.Idle;
     }
 

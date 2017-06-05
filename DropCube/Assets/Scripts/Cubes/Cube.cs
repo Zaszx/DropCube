@@ -16,11 +16,12 @@ public class Cube : MonoBehaviour
 	public virtual void Start () 
     {
         isMarkedToMove = false;
-	}
-	
-	public virtual void Update () 
-    {
         UpdateShaderProperties();
+    }
+
+    public virtual void Update () 
+    {
+        //UpdateShaderProperties();
 
     }
 

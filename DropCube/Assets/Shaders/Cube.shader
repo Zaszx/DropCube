@@ -65,7 +65,7 @@
 			else
 			{
 				o.Emission = float3(0, 0, 0);
-				o.Albedo = o.Albedo * 0.6;
+				o.Albedo = o.Albedo * 0.8;
 			}
 		}
 		ENDCG

@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     public Button menuButton;
     public Button nextLevelButton;
 
+    public Image backGround;
+
     public SaveData saveData = new SaveData();
 
     void Awake()
@@ -105,6 +107,7 @@ public class GameManager : MonoBehaviour
     public void OpenMenu()
     {
         menuManager.SetVisible(true);
+        backGround.sprite = Prefabs.playScreens[0];
         gameState = GameState.Menu;
     }
 
@@ -166,6 +169,13 @@ public class GameManager : MonoBehaviour
 
     public void OnLevelFinished(int starCount)
     {
+        if (openLevelIndex + 1 > maxOpenLevel)
+        {
+            maxOpenLevel = openLevelIndex + 1;
+            menuManager.UnlockLevel(openLevelIndex + 1);
+            saveData.level = maxOpenLevel;
+            saveData.Write();
+        }
         gameState = GameState.LevelCleared;
     }
 
@@ -222,6 +232,7 @@ public class GameManager : MonoBehaviour
             undoButton.gameObject.SetActive(false);
             nextLevelButton.gameObject.SetActive(false);
             menuButton.gameObject.SetActive(false);
+            menuManager.Tick();
 
 //             Camera.main.transform.position = new Vector3(0, 10, 0);
 //             Camera.main.transform.rotation = Quaternion.identity;
@@ -241,7 +252,8 @@ public class GameManager : MonoBehaviour
 
     public void NextLevelButtonClicked()
     {
-        OnLevelButtonClicked(levels[openLevelIndex + 1]);
+        NextLevel();
+        //OnLevelButtonClicked(levels[openLevelIndex + 1]);
     }
 
     public void MenuButtonClicked()
@@ -249,6 +261,7 @@ public class GameManager : MonoBehaviour
         scene.Clear();
         swipeData.Reset();
         gameState = GameState.Menu;
+        backGround.sprite = Prefabs.playScreens[0];
         StaticCoroutine.StopAllCoroutines();
         menuManager.SetVisible(true);
     }
