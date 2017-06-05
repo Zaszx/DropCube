@@ -222,6 +222,9 @@ public class GameManager : MonoBehaviour
             undoButton.gameObject.SetActive(false);
             nextLevelButton.gameObject.SetActive(false);
             menuButton.gameObject.SetActive(false);
+
+//             Camera.main.transform.position = new Vector3(0, 10, 0);
+//             Camera.main.transform.rotation = Quaternion.identity;
         }
 
 	}
@@ -244,6 +247,9 @@ public class GameManager : MonoBehaviour
     public void MenuButtonClicked()
     {
         scene.Clear();
+        swipeData.Reset();
+        gameState = GameState.Menu;
+        StaticCoroutine.StopAllCoroutines();
         menuManager.SetVisible(true);
     }
 

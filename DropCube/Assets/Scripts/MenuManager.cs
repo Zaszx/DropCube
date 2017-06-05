@@ -30,7 +30,7 @@ public class MenuManager
             Button newButton = GameObject.Instantiate(Prefabs.levelButton).GetComponent<Button>();
             newButton.transform.SetParent(buttonsParent.transform);
             RectTransform newButtonTransform = newButton.GetComponent<RectTransform>();
-            newButtonTransform.position = position;
+            //newButtonTransform.position = position;
             newButtonTransform.localScale = Vector3.one;
             newButtonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
 
@@ -81,5 +81,9 @@ public class MenuManager
     public void SetVisible(bool value)
     {
         menuParent.SetActive(value);
+        foreach(KeyValuePair<Button, Level> pair in buttonToLevelMap)
+        {
+            pair.Key.GetComponent<RectTransform>().position = Vector3.zero;
+        }
     }
 }

@@ -44,6 +44,7 @@ public class InitialScreenManager : MonoBehaviour
 
 	void Update () 
     {
+        tutorialScene.levelRootObject.SetActive(false);
         tutorialScene.Tick();
 		if(tutorialScene.sceneStatus == SceneStatus.Idle && waiting == false)
         {

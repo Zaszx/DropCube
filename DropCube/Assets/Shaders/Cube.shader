@@ -50,12 +50,22 @@
 			o.Albedo = _Color.rgb;
 			o.Alpha = 1.0;
 
-			o.Emission = o.Albedo * _Argument.x * (sin(_Time.w) * 0.2 + 0.2) + o.Albedo * _Argument.y;
+			//o.Emission = o.Albedo * _Argument.x * (sin(_Time.w) * 0.2 + 0.2) + o.Albedo * _Argument.y;
 
 			// Borders
 			if(IN.uv_MainTex.x < 0.05 || IN.uv_MainTex.x > 0.95 || IN.uv_MainTex.y < 0.05 || IN.uv_MainTex.y > 0.95)
 			{
 				o.Albedo = float3(29.0 / 255.0, 89.0 / 255.0, 106.0 / 255.0);
+			}
+
+			if (o.Albedo.x > 0.95 && o.Albedo.y > 0.95 && o.Albedo.z > 0.95)
+			{
+				o.Emission = o.Albedo;
+			}
+			else
+			{
+				o.Emission = float3(0, 0, 0);
+				o.Albedo = o.Albedo * 0.6;
 			}
 		}
 		ENDCG
