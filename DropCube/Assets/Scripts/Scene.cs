@@ -671,6 +671,9 @@ public class Scene
     public IEnumerator UndoCoroutine()
     {
         sceneStatus = SceneStatus.Undoing;
+
+        backgroundImage.sprite = Prefabs.playScreens[screenIndex];
+
         SceneUndoData undoData = undoManager.GetLastOperation();
         int maxFallAmount = 0;
         foreach(CubeUndoData cubeData in undoData.cubeData)
@@ -816,6 +819,7 @@ public class Scene
         if(cube.GetCubeType() == CubeType.Good)
         {
             sceneStatus = SceneStatus.Errored;
+            backgroundImage.sprite = Prefabs.failScreen;
         }
         else if(cube.GetCubeType() == CubeType.Bad)
         {
@@ -826,7 +830,10 @@ public class Scene
             {
                 screenIndex = 0;
             }
-            backgroundImage.sprite = Prefabs.playScreens[screenIndex];
+            if(sceneStatus != SceneStatus.Errored)
+            {
+                backgroundImage.sprite = Prefabs.playScreens[screenIndex];
+            }
 
             if (moveContainsError == false)
             {
