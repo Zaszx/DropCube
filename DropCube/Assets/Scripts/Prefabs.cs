@@ -15,6 +15,8 @@ public static class Prefabs
     public static Sprite[] playScreens = new Sprite[3];
     public static Sprite failScreen;
     public static Sprite clearScreen;
+
+    public static GameObject prism;
     
     static Prefabs()
     {
@@ -23,6 +25,7 @@ public static class Prefabs
         goodCube = Resources.Load<GameObject>("Prefabs/GoodCube");
         badCube = Resources.Load<GameObject>("Prefabs/BadCube");
         wallCube = Resources.Load<GameObject>("Prefabs/WallCube");
+        prism = Resources.Load<GameObject>("Prefabs/Prism");
 
         levelButton = Resources.Load<GameObject>("Prefabs/UI/levelButton");
 

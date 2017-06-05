@@ -950,6 +950,40 @@ public class Scene
 
             cubes[x, y] = newCube;
             cubeIndex++;
+            if(newCube.GetCubeType() == CubeType.Gray)
+            {
+                if (x == 0)
+                {
+                    GameObject prism = GameObject.Instantiate(Prefabs.prism);
+                    prism.transform.position = new Vector3(-1, 0, y);
+                    Vector3 prismRotation = new Vector3(0, 90, 0);
+                    prism.transform.rotation = Quaternion.Euler(prismRotation);
+                    prism.transform.parent = levelRootObject.transform;
+                }
+                if (y == 0)
+                {
+                    GameObject prism = GameObject.Instantiate(Prefabs.prism);
+                    prism.transform.position = new Vector3(x, 0, -1);
+
+                    prism.transform.parent = levelRootObject.transform;
+                }
+                if (x == levelWidth - 1)
+                {
+                    GameObject prism = GameObject.Instantiate(Prefabs.prism);
+                    prism.transform.position = new Vector3(levelWidth, 0, y);
+                    Vector3 prismRotation = new Vector3(0, -90, 0);
+                    prism.transform.rotation = Quaternion.Euler(prismRotation);
+                    prism.transform.parent = levelRootObject.transform;
+                }
+                if (y == levelHeight - 1)
+                {
+                    GameObject prism = GameObject.Instantiate(Prefabs.prism);
+                    prism.transform.position = new Vector3(x, 0, levelHeight);
+                    Vector3 prismRotation = new Vector3(0, 180, 0);
+                    prism.transform.rotation = Quaternion.Euler(prismRotation);
+                    prism.transform.parent = levelRootObject.transform;
+                }
+            }
 
             cubeNode = cubeNode.NextSibling;
         }
