@@ -55,7 +55,7 @@
 			// Borders
 			if(IN.uv_MainTex.x < 0.05 || IN.uv_MainTex.x > 0.95 || IN.uv_MainTex.y < 0.05 || IN.uv_MainTex.y > 0.95)
 			{
-				o.Albedo = float3(0,0,0);
+				o.Albedo = float3(29.0 / 255.0, 89.0 / 255.0, 106.0 / 255.0);
 			}
 		}
 		ENDCG

@@ -17,7 +17,7 @@ public class Wall : Cube
 
     public override Color GetCubeColor()
     {
-        return Color.black;
+        return new Color(29.0f / 255.0f, 89.0f / 255.0f, 106.0f / 255.0f);
     }
 
     public override CubeType GetCubeType()

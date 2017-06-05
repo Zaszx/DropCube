@@ -11,6 +11,10 @@ public static class Prefabs
 
     public static GameObject levelButton;
     public static GameObject tickObject;
+
+    public static Sprite[] playScreens = new Sprite[3];
+    public static Sprite failScreen;
+    public static Sprite clearScreen;
     
     static Prefabs()
     {
@@ -23,6 +27,14 @@ public static class Prefabs
         levelButton = Resources.Load<GameObject>("Prefabs/UI/levelButton");
 
         tickObject = Resources.Load<GameObject>("Prefabs/UI/TickIcon");
+
+        playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/play-screen");
+        playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/play-screen_2");
+        playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/play-screen_3");
+
+        failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
+
+        clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)

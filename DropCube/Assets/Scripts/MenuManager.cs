@@ -18,8 +18,6 @@ public class MenuManager
 
         menuParent = GameObject.Find("MenuParent");
         buttonsParent = GameObject.Find("ButtonsParent");
-        buttonsParent.transform.parent = menuParent.transform;
-        buttonsParent.transform.position = Vector3.zero;
 
         float minLength = Mathf.Min(Screen.width, Screen.height) * 0.9f;
         float buttonSize = minLength * 0.2f;
@@ -57,7 +55,7 @@ public class MenuManager
 
         this.maxOpenLevel = maxOpenLevel;
 
-        buttonsParent.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
+        //buttonsParent.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
     }
 
     public void UnlockLevel(int index)

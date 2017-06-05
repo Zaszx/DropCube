@@ -18,7 +18,7 @@ public class BadCube : Cube
 
     public override Color GetCubeColor()
     {
-        return Color.red;
+        return Color.white;
     }
 
     public override CubeType GetCubeType()

@@ -45,7 +45,7 @@ public class Cube : MonoBehaviour
 
     public virtual Color GetCubeColor()
     {
-        return Color.gray;
+        return new Color(157.0f / 255.0f, 211.0f / 255.0f, 234.0f / 255.0f);
     }
 
     public virtual bool IsStatic()

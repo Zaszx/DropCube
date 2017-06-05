@@ -18,7 +18,7 @@ public class GoodCube : Cube
 
     public override Color GetCubeColor()
     {
-        return Color.green;
+        return Color.black;
     }
 
     public override CubeType GetCubeType()

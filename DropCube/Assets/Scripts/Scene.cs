@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using UnityEngine.UI;
 
 public enum Direction
 {
@@ -48,6 +49,9 @@ public class Scene
 
     public bool moveContainsError;
 
+    public int screenIndex;
+    public Image backgroundImage;
+
     public Scene()
     {
         sceneStatus = SceneStatus.Idle;
@@ -60,6 +64,9 @@ public class Scene
         gravityDirection = Direction.Down;
 
         ticksParent = GameObject.Find("TicksParent");
+        backgroundImage = GameObject.Find("Background").GetComponent<Image>();
+
+        screenIndex = 0;
 
         moveContainsError = false;
     }
@@ -797,6 +804,7 @@ public class Scene
     {
         if(gameManager != null)
         {
+            backgroundImage.sprite = Prefabs.clearScreen;
             gameManager.OnLevelFinished(0);
         }
     }
@@ -811,7 +819,14 @@ public class Scene
         {
             Vector3 cubeLastPosition = cube.transform.position;
             cube.gameObject.SetActive(false);
-            if(moveContainsError == false)
+            screenIndex++;
+            if(screenIndex == 3)
+            {
+                screenIndex = 0;
+            }
+            backgroundImage.sprite = Prefabs.playScreens[screenIndex];
+
+            if (moveContainsError == false)
             {
                 bool andBadCubeLeft = false;
                 foreach (Cube c in dynamicCubes)
