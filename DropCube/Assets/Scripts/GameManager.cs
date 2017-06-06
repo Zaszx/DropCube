@@ -192,7 +192,7 @@ public class GameManager : MonoBehaviour
 
             if (swipeData.swipeStatus == SwipeStatus.Finished)
             {
-                if (scene.sceneStatus == SceneStatus.Idle)
+                if (scene.sceneStatus == SceneStatus.Idle && swipeData.isSingleClick == false)
                 {
                     Vector2 resultSwipe = swipeData.resultSwipe;
                     Vector2 swipeDirection = GetDigitalDirectionFromAnalog(resultSwipe);
@@ -224,7 +224,7 @@ public class GameManager : MonoBehaviour
         else if(gameState == GameState.LevelCleared)
         {
             undoButton.gameObject.SetActive(false);
-            nextLevelButton.gameObject.SetActive(true);
+            nextLevelButton.gameObject.SetActive(openLevelIndex != levels.Count);
             menuButton.gameObject.SetActive(true);
         }
         else if(gameState == GameState.Menu)

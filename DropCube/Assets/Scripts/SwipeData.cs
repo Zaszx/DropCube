@@ -99,7 +99,7 @@ public class SwipeData
             resultSwipe = endPosition - startPosition;
             resultSwipe.Normalize();
 
-            if(Vector2.Distance(endPosition, startPosition) < 1.0f)
+            if(Vector2.Distance(endPosition, startPosition) < 25.0f)
             {
                 isSingleClick = true;
             }

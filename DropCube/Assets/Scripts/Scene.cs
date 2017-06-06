@@ -118,6 +118,7 @@ public class Scene
 
             Clear();
             int gridSize = Random.Range(complexity / 4, complexity / 3);
+            gridSize = Mathf.Clamp(gridSize, 5, 15);
             CreateNewLevel(gridSize, gridSize);
 
             // Create Holes
@@ -144,6 +145,14 @@ public class Scene
 
                 Cube currentCube = cubes[holeXIndex, holeYIndex];
                 if (currentCube.GetCubeType() == CubeType.Gray)
+                {
+                    i--;
+                    continue;
+                }
+                if((holeXIndex == 0 && holeYIndex == 0) ||
+                    (holeXIndex == gridSize - 1 && holeYIndex == 0) ||
+                    (holeXIndex == 0 && holeYIndex == gridSize - 1) ||
+                    (holeXIndex == gridSize - 1 && holeYIndex == gridSize - 1))
                 {
                     i--;
                     continue;

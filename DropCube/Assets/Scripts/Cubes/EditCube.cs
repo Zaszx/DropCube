@@ -53,19 +53,19 @@ public class EditCube : Cube
     {
         if(cubeType == CubeType.Gray)
         {
-            return Color.gray;
+            return new Color(157.0f / 255.0f, 211.0f / 255.0f, 234.0f / 255.0f);
         }
         else if(cubeType == CubeType.Bad)
         {
-            return Color.red;
+            return Color.white;
         }
         else if(cubeType == CubeType.Good)
         {
-            return Color.green;
+            return Color.black;
         }
         else if(cubeType == CubeType.Wall)
         {
-            return new Color(0.1f, 0.1f, 0.1f);
+            return new Color(29.0f / 255.0f, 89.0f / 255.0f, 106.0f / 255.0f);
         }
         return Color.black;
     }
