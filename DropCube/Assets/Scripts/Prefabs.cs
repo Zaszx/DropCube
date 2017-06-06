@@ -11,6 +11,7 @@ public static class Prefabs
 
     public static GameObject levelButton;
     public static GameObject tickObject;
+    public static GameObject exclam;
 
     public static Sprite[] playScreens = new Sprite[3];
     public static Sprite failScreen;
@@ -26,6 +27,7 @@ public static class Prefabs
         badCube = Resources.Load<GameObject>("Prefabs/BadCube");
         wallCube = Resources.Load<GameObject>("Prefabs/WallCube");
         prism = Resources.Load<GameObject>("Prefabs/Prism");
+        exclam = Resources.Load<GameObject>("Prefabs/exclam");
 
         levelButton = Resources.Load<GameObject>("Prefabs/UI/levelButton");
 

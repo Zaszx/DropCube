@@ -32,6 +32,11 @@ public class GameManager : MonoBehaviour
 
     public SaveData saveData = new SaveData();
 
+    public float undoButtonSeconds;
+    public bool undoButtonIsDown;
+
+    public Text pressAndHoldText;
+
     void Awake()
     {
         levels.Add(new Level("Levels/level0"));
@@ -101,8 +106,13 @@ public class GameManager : MonoBehaviour
 
         nextLevelButton.gameObject.SetActive(false);
 
+        undoButtonIsDown = false;
+        undoButtonSeconds = 0.0f;
+
+        pressAndHoldText.gameObject.SetActive(false);
+
         //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
-	}
+    }
 
     public void OpenMenu()
     {
@@ -127,6 +137,21 @@ public class GameManager : MonoBehaviour
         scene.ReadLevel(levels[openLevelIndex], "", false);
         gameState = GameState.Game;
         swipeData.Reset();
+    }
+
+    public void UndoButtonDown()
+    {
+        if(undoButton.IsInteractable())
+        {
+            undoButtonIsDown = true;
+            pressAndHoldText.gameObject.SetActive(true);
+        }
+    }
+
+    public void UndoButtonUp()
+    {
+        undoButtonIsDown = false;
+        pressAndHoldText.gameObject.SetActive(false);
     }
 
     public void OnLevelButtonClicked(Level level)
@@ -185,6 +210,22 @@ public class GameManager : MonoBehaviour
 
         if(gameState == GameState.Game)
         {
+            if(undoButtonIsDown)
+            {
+                undoButtonSeconds += Time.deltaTime;
+            }
+            else
+            {
+                undoButtonSeconds = 0.0f;
+            }
+            if(undoButtonSeconds > 2.0f)
+            {
+                scene.UndoAllTriggered();
+                undoButtonIsDown = false;
+                undoButtonSeconds = 0.0f;
+                pressAndHoldText.gameObject.SetActive(false);
+            }
+
             undoButton.gameObject.SetActive(true);
             menuButton.gameObject.SetActive(true);
 

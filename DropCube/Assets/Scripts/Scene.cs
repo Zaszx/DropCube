@@ -53,6 +53,8 @@ public class Scene
     public int screenIndex;
     public Image backgroundImage;
 
+    public List<GameObject> exclams = new List<GameObject>();
+
     public Scene()
     {
         sceneStatus = SceneStatus.Loading;
@@ -108,6 +110,20 @@ public class Scene
         levelHeight = 0;
         moveContainsError = false;
         GameObject.Destroy(levelRootObject);
+    }
+
+    public void UndoAllTriggered()
+    {
+        StaticCoroutine.StartCoroutine(UndoAllCoroutine());
+    }
+
+    public IEnumerator UndoAllCoroutine()
+    {
+        while(undoManager.doneOperations.Count > 0)
+        {
+            Coroutine c = StaticCoroutine.StartCoroutine(UndoCoroutine());
+            yield return c;
+        }
     }
 
     public int Generate(int complexity)
@@ -680,6 +696,12 @@ public class Scene
 
     public IEnumerator UndoCoroutine()
     {
+        foreach(GameObject exclam in exclams)
+        {
+            GameObject.Destroy(exclam);
+        }
+        exclams.Clear();
+
         sceneStatus = SceneStatus.Undoing;
 
         backgroundImage.sprite = Prefabs.playScreens[screenIndex];
@@ -836,6 +858,9 @@ public class Scene
         {
             sceneStatus = SceneStatus.Errored;
             backgroundImage.sprite = Prefabs.failScreen;
+            GameObject exclam = GameObject.Instantiate(Prefabs.exclam);
+            exclam.transform.position = cube.transform.position + Vector3.up * 0.3f;
+            exclams.Add(exclam);
         }
         else if(cube.GetCubeType() == CubeType.Bad)
         {
