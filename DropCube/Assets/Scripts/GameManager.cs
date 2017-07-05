@@ -11,6 +11,12 @@ public enum GameState
 
 }
 
+public enum TutorialState
+{
+    Playing,
+    Finished,
+}
+
 public class GameManager : MonoBehaviour 
 {
     Scene scene;
@@ -36,6 +42,12 @@ public class GameManager : MonoBehaviour
     public bool undoButtonIsDown;
 
     public Text pressAndHoldText;
+
+    public Image tutorialHand;
+    public Transform tutorialHandInitialTransform;
+    public Transform tutorialHandTargetTransform;
+
+    public TutorialState tutorialState;
 
     void Awake()
     {
@@ -167,6 +179,10 @@ public class GameManager : MonoBehaviour
         menuManager.SetVisible(false);
 
         openLevelIndex = levels.IndexOf(level);
+        if(openLevelIndex == 0)
+        {
+            StartCoroutine(TutorialHandCoroutine());
+        }
         swipeData.Reset();
     }
 
@@ -202,6 +218,39 @@ public class GameManager : MonoBehaviour
             saveData.Write();
         }
         gameState = GameState.LevelCleared;
+    }
+
+    public IEnumerator TutorialHandCoroutine()
+    {
+        tutorialHand.gameObject.SetActive(true);
+
+        while(true)
+        {
+            Vector3 handInitialPosition = tutorialHandInitialTransform.position;
+            Vector3 handTargetPosition = tutorialHandTargetTransform.position;
+
+            float currentTime = -0.5f;
+            float totalTime = 1.0f;
+
+            while(currentTime < totalTime + 0.5f)
+            {
+                if (gameState == GameState.LevelCleared || gameState == GameState.Menu)
+                {
+                    break;
+                }
+
+                tutorialHand.rectTransform.position = Vector3.Lerp(handInitialPosition, handTargetPosition, currentTime / totalTime);
+
+                yield return new WaitForEndOfFrame();
+                currentTime = currentTime + Time.deltaTime;
+            }
+            if(gameState == GameState.LevelCleared || gameState == GameState.Menu)
+            {
+                break;
+            }
+        }
+
+        tutorialHand.gameObject.SetActive(false);
     }
 
     void Update () 
