@@ -147,6 +147,7 @@ public class EditingManager : MonoBehaviour
         scene.ReadLevel(null, filePath, true);
         UpdateEditCubes();
 
+        lastOpenedScenePath = filePath;
         screenshotPath = filePath.Substring(0, filePath.LastIndexOf("/"));
         screenshotPath = screenshotPath + "/ss.png";
     }

@@ -1,7 +1,7 @@
 <level levelWidth="7" levelHeight="7">
   <cubes>
     <cube type="Wall" />
-    <cube type="Wall" />
+    <cube type="Gray" />
     <cube type="Gray" />
     <cube type="Wall" />
     <cube type="Wall" />
@@ -27,7 +27,7 @@
     <cube type="Wall" />
     <cube type="Gray" />
     <cube type="Gray" />
-    <cube type="Gray" />
+    <cube type="Wall" />
     <cube type="Wall" />
     <cube type="Gray" />
     <cube type="Gray" />
