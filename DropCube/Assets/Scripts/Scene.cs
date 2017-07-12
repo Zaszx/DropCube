@@ -491,7 +491,7 @@ public class Scene
                 staticCubes[i, j] = newCube;
 
                 newCube.transform.parent = levelRootObject.transform;
-                newCube.UpdateShaderProperties();
+                //newCube.UpdateShaderProperties();
             }
         }
 

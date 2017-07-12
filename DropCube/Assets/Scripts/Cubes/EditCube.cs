@@ -25,7 +25,7 @@ public class EditCube : Cube
 
         thisRenderer.material.SetVector(ShaderProperties.argumentId, new Vector4(highlighted ? 1 : 0, selected ? 1 : 0, 0, 0));
 
-        base.UpdateShaderProperties();
+        thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
     }
 
     public override bool IsStatic()

@@ -41,7 +41,7 @@ public class Cube : MonoBehaviour
     public virtual void UpdateShaderProperties()
     {
         Renderer thisRenderer = GetComponent<Renderer>();
-        thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
+        //thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
     }
 
     public virtual Color GetCubeColor()
