@@ -55,6 +55,8 @@ public class Scene
 
     public List<GameObject> exclams = new List<GameObject>();
 
+    public SkyboxController skybox;
+
     public Scene()
     {
         sceneStatus = SceneStatus.Loading;
@@ -73,6 +75,8 @@ public class Scene
         screenIndex = 0;
 
         moveContainsError = false;
+
+        skybox = Object.FindObjectOfType<SkyboxController>();
     }
 
     public void Clear()
@@ -705,6 +709,8 @@ public class Scene
 
         sceneStatus = SceneStatus.Undoing;
 
+        skybox.UndoEffect();
+
         backgroundImage.sprite = Prefabs.playScreens[screenIndex];
 
         SceneUndoData undoData = undoManager.GetLastOperation();
@@ -862,6 +868,7 @@ public class Scene
             GameObject exclam = GameObject.Instantiate(Prefabs.exclam);
             exclam.transform.position = cube.transform.position + Vector3.up * 0.3f;
             exclams.Add(exclam);
+            skybox.FailEffect();
         }
         else if(cube.GetCubeType() == CubeType.Bad)
         {

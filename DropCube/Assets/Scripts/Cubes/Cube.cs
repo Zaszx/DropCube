@@ -31,7 +31,8 @@ public class Cube : MonoBehaviour
         Vector3 initialPosition = transform.position;
         while(accumulatedTime < time)
         {
-            transform.position = Vector3.Lerp(initialPosition, position, accumulatedTime / time);
+            float t = Curve.Instance.CubeUndoMovement.Evaluate(accumulatedTime / time);
+            transform.position = Vector3.Lerp(initialPosition, position, t);
             yield return new WaitForEndOfFrame();
             accumulatedTime = accumulatedTime + Time.deltaTime;
         }
@@ -76,7 +77,7 @@ public class Cube : MonoBehaviour
 
         while(accumulatedTime < totalTime)
         {
-            var t = Curve.Instance.CubeMovement.Evaluate(accumulatedTime / totalTime);
+            float t = Curve.Instance.CubeMovement.Evaluate(accumulatedTime / totalTime);
 
             transform.position = Vector3.Lerp(initialPosition, targetPosition, t);
             yield return new WaitForEndOfFrame();
