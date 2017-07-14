@@ -576,7 +576,8 @@ public class Scene
 
         while(accumulatedTime < totalTime)
         {
-            levelRootObject.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, accumulatedTime / totalTime);
+            var t = Curve.Instance.SceneMovement.Evaluate(accumulatedTime / totalTime);
+            levelRootObject.transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, t);
             yield return new WaitForEndOfFrame();
             accumulatedTime = accumulatedTime + Time.deltaTime;
         }
