@@ -57,7 +57,7 @@
 			// Borders
 			if(IN.uv_MainTex.x < 0.05 || IN.uv_MainTex.x > 0.95 || IN.uv_MainTex.y < 0.05 || IN.uv_MainTex.y > 0.95)
 			{
-				o.Albedo = _SideColor;
+				o.Albedo = fixed3(96.0 / 255.0, 124.0 / 225.0, 120.0 / 255.0) * 0.6;
 			}
 
 			if (o.Albedo.x > 0.95 && o.Albedo.y > 0.95 && o.Albedo.z > 0.95)
