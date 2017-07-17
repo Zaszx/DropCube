@@ -5,7 +5,8 @@
 		_Color ("Main Color", Color) = (1,1,1,1)
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_Normal ("Normal", Vector) = (0, 1, 0, 0)
-
+		_SideColor ("Side Color", Color) = (1,1,1,1)
+		
 		// x: highlighted
 		// y: selected
 		_Argument ("Argument", Vector) = (0, 0, 0, 0)
@@ -35,6 +36,7 @@
 
 		sampler2D _MainTex;
 		fixed4 _Color;
+		fixed4 _SideColor;
 		uniform float4 _Normal;
 		uniform float4 _Argument;
 
@@ -55,7 +57,7 @@
 			// Borders
 			if(IN.uv_MainTex.x < 0.05 || IN.uv_MainTex.x > 0.95 || IN.uv_MainTex.y < 0.05 || IN.uv_MainTex.y > 0.95)
 			{
-				o.Albedo = float3(29.0 / 255.0, 89.0 / 255.0, 106.0 / 255.0);
+				o.Albedo = _SideColor;
 			}
 
 			if (o.Albedo.x > 0.95 && o.Albedo.y > 0.95 && o.Albedo.z > 0.95)

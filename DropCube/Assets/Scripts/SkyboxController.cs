@@ -20,7 +20,7 @@ public class SkyboxController : MonoBehaviour
         Camera.main.GetComponent<Skybox>().material = _skyMaterial;
 
         _baseExponent = _skyMaterial.GetFloat("_Exponent");
-        _failExponent = 0.91f;
+        _failExponent = 0.31f;
     }
 
     public void FailEffect()
