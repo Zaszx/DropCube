@@ -25,4 +25,5 @@ public class Curve : ScriptableObject
     public AnimationCurve SceneMovement;
     public AnimationCurve SkyColorChangeFail;
     public AnimationCurve SkyColorChangeUndo;
+    public AnimationCurve LevelLoadScale;
 }
