@@ -576,7 +576,8 @@ public class Scene
 
         while(accumulatedTime < totalTime)
         {
-            levelRootObject.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, accumulatedTime / totalTime);
+            var t = Curve.Instance.SceneMovement.Evaluate(accumulatedTime / totalTime);
+            levelRootObject.transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, t);
             yield return new WaitForEndOfFrame();
             accumulatedTime = accumulatedTime + Time.deltaTime;
         }
@@ -1046,7 +1047,9 @@ public class Scene
 
         while(currentTime < totalTime)
         {
-            levelRootObject.transform.localScale = Vector3.Lerp(/*levelRootObject.transform.localScale*/ load ? Vector3.zero : Vector3.one, load ? Vector3.one : Vector3.zero, currentTime / totalTime);
+            float t = Curve.Instance.LevelLoadScale.Evaluate(currentTime / totalTime);
+
+            levelRootObject.transform.localScale = Vector3.Lerp(/*levelRootObject.transform.localScale*/ load ? Vector3.zero : Vector3.one, load ? Vector3.one : Vector3.zero, t);
             yield return new WaitForEndOfFrame();
             currentTime = currentTime + Time.deltaTime;
         }

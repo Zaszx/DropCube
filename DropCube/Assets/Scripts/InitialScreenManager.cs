@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InitialScreenManager : MonoBehaviour 
 {
@@ -9,6 +10,8 @@ public class InitialScreenManager : MonoBehaviour
     public bool[] solution;
     public int currentSolutionIndex = 0;
     public bool waiting;
+    public Image whiteScreen;
+    public Button playButton;
 
     void Start () 
     {
@@ -62,6 +65,23 @@ public class InitialScreenManager : MonoBehaviour
 
     public void PlayButtonClicked()
     {
+        StartCoroutine(PlayButtonCoroutine());
+    }
+
+    public IEnumerator PlayButtonCoroutine()
+    {
+        playButton.interactable = false;
+        whiteScreen.CrossFadeAlpha(0.0f, 0.8f, true);
+
+        float currentTime = 0;
+        float totalTime = 1.0f;
+
+        while(currentTime < totalTime)
+        {
+            yield return new WaitForEndOfFrame();
+            currentTime = currentTime + Time.deltaTime;
+        }
+
         SceneManager.LoadScene("gameScene");
     }
 }
