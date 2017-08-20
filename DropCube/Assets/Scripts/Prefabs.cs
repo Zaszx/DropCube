@@ -14,6 +14,7 @@ public static class Prefabs
     public static GameObject exclam;
 
     public static Sprite[] playScreens = new Sprite[3];
+    public static Sprite levelSelectScreen;
     public static Sprite failScreen;
     public static Sprite clearScreen;
 
@@ -40,6 +41,7 @@ public static class Prefabs
         failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
 
         clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
+        levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/levelselect-screen");
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)

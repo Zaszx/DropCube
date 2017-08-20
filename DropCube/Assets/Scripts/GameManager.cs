@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviour
     public void OpenMenu()
     {
         menuManager.SetVisible(true);
-        backGround.sprite = Prefabs.playScreens[0];
+        backGround.sprite = Prefabs.levelSelectScreen;
         gameState = GameState.Menu;
     }
 
@@ -350,10 +350,8 @@ public class GameManager : MonoBehaviour
     {
         scene.Clear();
         swipeData.Reset();
-        gameState = GameState.Menu;
-        backGround.sprite = Prefabs.playScreens[0];
+        OpenMenu();
         StaticCoroutine.StopAllCoroutines();
-        menuManager.SetVisible(true);
     }
 
 }

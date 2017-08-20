@@ -55,7 +55,9 @@
 			// Borders
 			if(IN.uv_MainTex.x < 0.05 || IN.uv_MainTex.x > 0.95 || IN.uv_MainTex.y < 0.05 || IN.uv_MainTex.y > 0.95)
 			{
-				o.Albedo = float3(29.0 / 255.0, 89.0 / 255.0, 106.0 / 255.0);
+				//o.Albedo = float3(0.035, 0.216, 0.267);
+				//o.Albedo = float3(0.135f, 0.316f, 0.367f);
+				o.Albedo = float3(0.185f, 0.366f, 0.407f);
 			}
 
 			if (o.Albedo.x > 0.95 && o.Albedo.y > 0.95 && o.Albedo.z > 0.95)
