@@ -57,7 +57,7 @@
 			{
 				//o.Albedo = float3(0.035, 0.216, 0.267);
 				//o.Albedo = float3(0.135f, 0.316f, 0.367f);
-				o.Albedo = float3(0.185f, 0.366f, 0.407f);
+				o.Albedo = float3(0.215f, 0.386f, 0.427f);
 			}
 
 			if (o.Albedo.x > 0.95 && o.Albedo.y > 0.95 && o.Albedo.z > 0.95)

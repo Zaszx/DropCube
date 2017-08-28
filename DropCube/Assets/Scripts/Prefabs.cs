@@ -13,6 +13,7 @@ public static class Prefabs
     public static GameObject tickObject;
     public static GameObject exclam;
 
+    public static Sprite initialScreen;
     public static Sprite[] playScreens = new Sprite[3];
     public static Sprite levelSelectScreen;
     public static Sprite failScreen;
@@ -34,14 +35,44 @@ public static class Prefabs
 
         tickObject = Resources.Load<GameObject>("Prefabs/UI/TickIcon");
 
-        playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/play-screen");
-        playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/play-screen_2");
-        playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/play-screen_3");
+        if (IsTablet())
+        {
+            playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen");
+            playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen_2");
+            playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen_3");
 
-        failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
+            failScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/fail-screen");
 
-        clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
-        levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/levelselect-screen");
+            initialScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/start-screen");
+
+            clearScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/clear-screen");
+            levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/levelselect-screen");
+        }
+        else
+        {
+            playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/play-screen");
+            playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/play-screen_2");
+            playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/play-screen_3");
+
+            failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
+
+            initialScreen = Resources.Load<Sprite>("Images/backgrounds/start-screen");
+
+            clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
+            levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/levelselect-screen");
+        }
+    }
+
+    private static bool IsTablet()
+    {
+        float screenWidth = Screen.width / Screen.dpi;
+        float screenHeight = Screen.height / Screen.dpi;
+        float ratio = screenWidth / screenHeight;
+        if(screenWidth / screenHeight > 0.65f)
+        {
+            return true;
+        }
+        return false;
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)

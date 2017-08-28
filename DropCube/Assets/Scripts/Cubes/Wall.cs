@@ -20,7 +20,8 @@ public class Wall : Cube
         //return new Color(29.0f / 255.0f, 89.0f / 255.0f, 106.0f / 255.0f);
         //return new Color(0.035f, 0.216f, 0.267f);
         //return new Color(0.135f, 0.316f, 0.367f);
-        return new Color(0.185f, 0.366f, 0.407f);
+        //return new Color(0.185f, 0.366f, 0.407f);
+        return new Color(0.215f, 0.386f, 0.427f);
     }
 
     public override CubeType GetCubeType()

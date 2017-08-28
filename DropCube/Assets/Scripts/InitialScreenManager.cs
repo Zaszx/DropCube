@@ -11,11 +11,13 @@ public class InitialScreenManager : MonoBehaviour
     public int currentSolutionIndex = 0;
     public bool waiting;
     public Image whiteScreen;
+    public Image background;
     public Button playButton;
 
     void Start () 
     {
-        StartCoroutine(ResetCoroutine());
+        background.sprite = Prefabs.initialScreen;
+        //StartCoroutine(ResetCoroutine());
     }
 
     private void Reset()
