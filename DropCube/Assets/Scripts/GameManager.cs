@@ -2,19 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Advertisements;
 
 public enum GameState
 {
     Menu,
     Game,
     LevelCleared,
-
-}
-
-public enum TutorialState
-{
-    Playing,
-    Finished,
 }
 
 public class GameManager : MonoBehaviour 
@@ -38,7 +32,7 @@ public class GameManager : MonoBehaviour
 
     public SaveData saveData = new SaveData();
 
-    public float undoButtonSeconds;
+    public float undoButtonClickTime;
     public bool undoButtonIsDown;
 
     public Text pressAndHoldText;
@@ -46,61 +40,15 @@ public class GameManager : MonoBehaviour
     public Image tutorialHand;
     public Transform tutorialHandInitialTransform;
     public Transform tutorialHandTargetTransform;
-
-    public TutorialState tutorialState;
-
+    
     void Awake()
     {
-        levels.Add(new Level("Levels/level0"));
-        levels.Add(new Level("Levels/level1"));
-        levels.Add(new Level("Levels/level2"));
-        levels.Add(new Level("Levels/level3"));
-        levels.Add(new Level("Levels/level4"));
-        levels.Add(new Level("Levels/level5"));
-        levels.Add(new Level("Levels/level6"));
-        levels.Add(new Level("Levels/level7"));
-        levels.Add(new Level("Levels/level8"));
-        levels.Add(new Level("Levels/level9"));
-        levels.Add(new Level("Levels/level10"));
-        levels.Add(new Level("Levels/level11"));
-        levels.Add(new Level("Levels/level12"));
-        levels.Add(new Level("Levels/level13"));
-        levels.Add(new Level("Levels/level14"));
-        levels.Add(new Level("Levels/level15"));
-        levels.Add(new Level("Levels/level16"));
-        levels.Add(new Level("Levels/level17"));
-        levels.Add(new Level("Levels/level18"));
-        levels.Add(new Level("Levels/level19"));
-        levels.Add(new Level("Levels/level20"));
-        levels.Add(new Level("Levels/level21"));
-        levels.Add(new Level("Levels/level22"));
-        levels.Add(new Level("Levels/level23"));
-        levels.Add(new Level("Levels/level24"));
-        levels.Add(new Level("Levels/level25"));
-        levels.Add(new Level("Levels/level26"));
-        levels.Add(new Level("Levels/level27"));
-        levels.Add(new Level("Levels/level28"));
-        levels.Add(new Level("Levels/level29"));
-        levels.Add(new Level("Levels/level30"));
-        levels.Add(new Level("Levels/level31"));
-        levels.Add(new Level("Levels/level32"));
-        levels.Add(new Level("Levels/level33"));
-        levels.Add(new Level("Levels/level34"));
-        levels.Add(new Level("Levels/level35"));
-        levels.Add(new Level("Levels/level36"));
-        levels.Add(new Level("Levels/level37"));
-        levels.Add(new Level("Levels/level38"));
-        levels.Add(new Level("Levels/level39"));
-        levels.Add(new Level("Levels/level40"));
-        levels.Add(new Level("Levels/level41"));
-        levels.Add(new Level("Levels/level42"));
-        levels.Add(new Level("Levels/level43"));
-        levels.Add(new Level("Levels/level44"));
-        levels.Add(new Level("Levels/level45"));
-        levels.Add(new Level("Levels/level46"));
-        levels.Add(new Level("Levels/level47"));
-        levels.Add(new Level("Levels/level48"));
-        levels.Add(new Level("Levels/level49"));
+        int levelCount = 50;
+        for(int i = 0; i < levelCount; i++)
+        {
+            string levelPath = "Levels/level" + i;
+            levels.Add(new Level(levelPath));
+        }
     }
 
     void Start () 
@@ -119,17 +67,15 @@ public class GameManager : MonoBehaviour
         nextLevelButton.gameObject.SetActive(false);
 
         undoButtonIsDown = false;
-        undoButtonSeconds = 0.0f;
+        undoButtonClickTime = 0.0f;
 
         pressAndHoldText.gameObject.SetActive(false);
-
-        //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
     }
 
     public void OpenMenu()
     {
         menuManager.SetVisible(true);
-        backGround.sprite = Prefabs.playScreens[0];
+        backGround.sprite = Prefabs.levelSelectScreen;
         gameState = GameState.Menu;
     }
 
@@ -261,17 +207,17 @@ public class GameManager : MonoBehaviour
         {
             if(undoButtonIsDown)
             {
-                undoButtonSeconds += Time.deltaTime;
+                undoButtonClickTime += Time.deltaTime;
             }
             else
             {
-                undoButtonSeconds = 0.0f;
+                undoButtonClickTime = 0.0f;
             }
-            if(undoButtonSeconds > 2.0f)
+            if(undoButtonClickTime > 2.0f)
             {
                 scene.UndoAllTriggered();
                 undoButtonIsDown = false;
-                undoButtonSeconds = 0.0f;
+                undoButtonClickTime = 0.0f;
                 pressAndHoldText.gameObject.SetActive(false);
             }
 
@@ -323,9 +269,6 @@ public class GameManager : MonoBehaviour
             nextLevelButton.gameObject.SetActive(false);
             menuButton.gameObject.SetActive(false);
             menuManager.Tick();
-
-//             Camera.main.transform.position = new Vector3(0, 10, 0);
-//             Camera.main.transform.rotation = Quaternion.identity;
         }
 
 	}
@@ -343,17 +286,14 @@ public class GameManager : MonoBehaviour
     public void NextLevelButtonClicked()
     {
         NextLevel();
-        //OnLevelButtonClicked(levels[openLevelIndex + 1]);
     }
 
     public void MenuButtonClicked()
     {
         scene.Clear();
         swipeData.Reset();
-        gameState = GameState.Menu;
-        backGround.sprite = Prefabs.playScreens[0];
+        OpenMenu();
         StaticCoroutine.StopAllCoroutines();
-        menuManager.SetVisible(true);
     }
 
 }

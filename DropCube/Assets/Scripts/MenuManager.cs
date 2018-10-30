@@ -7,15 +7,17 @@ public class MenuManager
 {
     public GameObject menuParent;
     public GameManager gameManager;
+
     public Dictionary<Button, Level> buttonToLevelMap = new Dictionary<Button, Level>();
-    public Dictionary<Button, int> buttonToLevelIndexMap = new Dictionary<Button, int>();
-    public Dictionary<int, Button> levelIndexToButtonMap = new Dictionary<int, Button>();
+    public Button[] levelButtons;
     public GameObject buttonsParent;
     public int maxOpenLevel;
 
     public void InitMenu(GameManager gameManager, List<Level> levels, int maxOpenLevel)
     {
         this.gameManager = gameManager;
+
+        levelButtons = new Button[levels.Count];
 
         menuParent = GameObject.Find("MenuParent");
         buttonsParent = GameObject.Find("ButtonsParent");
@@ -44,7 +46,6 @@ public class MenuManager
             newButton.GetComponent<Image>().sprite = levels[i].image;
 
             buttonToLevelMap.Add(newButton, levels[i]);
-            buttonToLevelIndexMap.Add(newButton, i);
 
             if (i > maxOpenLevel)
             {
@@ -53,22 +54,15 @@ public class MenuManager
                 newButton.GetComponent<Image>().color = color;
             }
 
-            levelIndexToButtonMap.Add(i, newButton);
+            levelButtons[i] = newButton;
         }
 
         this.maxOpenLevel = maxOpenLevel;
-
-        //buttonsParent.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
     }
 
     public void Tick()
     {
-//         foreach (KeyValuePair<Button, Level> pair in buttonToLevelMap)
-//         {
-//             pair.Key.GetComponent<RectTransform>().position = Vector3.one;
-// 
-//             pair.Key.GetComponent<RectTransform>().localPosition = Vector3.zero;
-//         }
+
     }
 
     public void UnlockLevel(int index)
@@ -76,7 +70,7 @@ public class MenuManager
         if(index > maxOpenLevel)
         {
             maxOpenLevel = index;
-            Button button = levelIndexToButtonMap[index];
+            Button button = levelButtons[index];
             button.GetComponent<Image>().color = Color.white;
         }
     }
@@ -94,24 +88,11 @@ public class MenuManager
     public void SetVisible(bool value)
     {
         menuParent.SetActive(value);
-        foreach(KeyValuePair<Button, int> pair in buttonToLevelIndexMap)
+        foreach(Button button in levelButtons)
         {
-            pair.Key.GetComponent<RectTransform>().position = Vector3.one;
-
-            pair.Key.GetComponent<RectTransform>().localPosition = Vector3.zero;
-
-//             if (pair.Value > gameManager.saveData.level)
-//             {
-//                 Color color = pair.Key.GetComponent<Image>().color;
-//                 color.a = 0.3f;
-//                 pair.Key.GetComponent<Image>().color = color;
-//             }
-//             else
-//             {
-//                 Color color = pair.Key.GetComponent<Image>().color;
-//                 color.a = 1.0f;
-//                 pair.Key.GetComponent<Image>().color = color;
-//             }
+            RectTransform buttonRectTransform = button.GetComponent<RectTransform>();
+            buttonRectTransform.position = Vector3.one;
+            buttonRectTransform.localPosition = Vector3.zero;
         }
     }
 }

@@ -31,8 +31,7 @@ public class Cube : MonoBehaviour
         Vector3 initialPosition = transform.position;
         while(accumulatedTime < time)
         {
-            float t = Curve.Instance.CubeUndoMovement.Evaluate(accumulatedTime / time);
-            transform.position = Vector3.Lerp(initialPosition, position, t);
+            transform.position = Vector3.Lerp(initialPosition, position, accumulatedTime / time);
             yield return new WaitForEndOfFrame();
             accumulatedTime = accumulatedTime + Time.deltaTime;
         }
@@ -42,12 +41,14 @@ public class Cube : MonoBehaviour
     public virtual void UpdateShaderProperties()
     {
         Renderer thisRenderer = GetComponent<Renderer>();
-        //thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
+        thisRenderer.material.SetColor(ShaderProperties.colorId, GetCubeColor());
     }
 
     public virtual Color GetCubeColor()
     {
-        return new Color(157.0f / 255.0f, 211.0f / 255.0f, 234.0f / 255.0f);
+        //return new Color(157.0f / 255.0f, 211.0f / 255.0f, 234.0f / 255.0f);
+        //return new Color(0.514f, 0.851f, 1);
+        return new Color(0.5f, 0.831f, 1);
     }
 
     public virtual bool IsStatic()
@@ -77,7 +78,7 @@ public class Cube : MonoBehaviour
 
         while(accumulatedTime < totalTime)
         {
-            float t = Curve.Instance.CubeMovement.Evaluate(accumulatedTime / totalTime);
+            var t = Curve.Instance.CubeMovement.Evaluate(accumulatedTime / totalTime);
 
             transform.position = Vector3.Lerp(initialPosition, targetPosition, t);
             yield return new WaitForEndOfFrame();

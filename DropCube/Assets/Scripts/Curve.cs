@@ -21,9 +21,6 @@ public class Curve : ScriptableObject
     }
 
     public AnimationCurve CubeMovement;
-    public AnimationCurve CubeUndoMovement;
     public AnimationCurve SceneMovement;
-    public AnimationCurve SkyColorChangeFail;
-    public AnimationCurve SkyColorChangeUndo;
     public AnimationCurve LevelLoadScale;
 }

@@ -1,5 +1,7 @@
 /DropCube/Temp
 /DropCube/Library
-/DropCube/ProjectSettings
 /DropCube/*.csproj
 /DropCube/*.sln
+/DropCube/.vs
+*.suo
+*.cache

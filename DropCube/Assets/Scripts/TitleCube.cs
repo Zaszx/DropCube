@@ -44,7 +44,6 @@ public class TitleCube : Cube
         transform.position = transform.position + Random.onUnitSphere * 3;
     }
 	
-	// Update is called once per frame
     public override void Update() 
     {
         transform.position = Vector3.Lerp(transform.position, initialPosition, Time.timeSinceLevelLoad * 0.05f);
