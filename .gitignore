@@ -2,3 +2,6 @@
 /DropCube/Library
 /DropCube/*.csproj
 /DropCube/*.sln
+/DropCube/.vs
+*.suo
+*.cache

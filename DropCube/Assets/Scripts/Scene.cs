@@ -27,6 +27,7 @@ public class Scene
 {
     public int levelWidth;
     public int levelHeight;
+
     public Direction gravityDirection;
     public Cube[,] staticCubes;
     public Cube[,] cubes;
@@ -48,7 +49,9 @@ public class Scene
 
     public Vector2 sceneCenterOnScreen;
 
-    public bool moveContainsError;
+    // If the rotation moves two cubes with the same height, which one drops first is non deterministic, which may lead to errors
+    // this variable holds if there is a situation like that; which means if this is true, this rotation cannot make the player win the game (a black cube will fall down on the next frame)
+    public bool moveHasMilimetricError;
 
     public int screenIndex;
     public Image backgroundImage;
@@ -72,7 +75,7 @@ public class Scene
 
         screenIndex = 0;
 
-        moveContainsError = false;
+        moveHasMilimetricError = false;
     }
 
     public void Clear()
@@ -108,7 +111,7 @@ public class Scene
         cubes = null;
         levelWidth = 0;
         levelHeight = 0;
-        moveContainsError = false;
+        moveHasMilimetricError = false;
         GameObject.Destroy(levelRootObject);
     }
 
@@ -236,7 +239,6 @@ public class Scene
                 movesRequired = movesRequiredToSolve;
                 break;
             }
-            int aa = solution.Count;
         }
 
         return movesRequired;
@@ -396,10 +398,6 @@ public class Scene
         Vector2 startingPosition = GetIterationBeginPoint(gravityDirection);
         if (gravityDirection.x == 0) gravityDirection.x = -1;
         if (gravityDirection.y == 0) gravityDirection.y = -1;
-        //         for(int i = Mathf.RoundToInt(startingPosition.x); (i < levelWidth && i >= 0); i = i - Mathf.RoundToInt(gravityDirection.x))
-        //         {
-        //             for(int j = Mathf.RoundToInt(startingPosition.y); (j < levelHeight && j >= 0); j = j - Mathf.RoundToInt(gravityDirection.y))
-        //             {
         for (int i = (int)startingPosition.x; (i < levelWidth && i >= 0); i = i - (int)gravityDirection.x)
         {
             for (int j = (int)startingPosition.y; (j < levelHeight && j >= 0); j = j - (int)gravityDirection.y)
@@ -454,18 +452,6 @@ public class Scene
     {
         EditCube currentCube = cubes[x, y] as EditCube;
         currentCube.cubeType = newCube;
-//         Cube currentCube = cubes[x, y];
-//         if(currentCube.IsStatic() == false)
-//         {
-//             GameObject.Destroy(staticCubes[x, y].gameObject);
-//         }
-//         GameObject.Destroy(currentCube.gameObject);
-// 
-//         cubes[x, y] = newCube;
-//         if(newCube.IsStatic())
-//         {
-//             staticCubes[x, y] = newCube;
-//         }
     }
 
     public void CreateNewLevel(int levelWidth, int levelHeight)
@@ -675,7 +661,7 @@ public class Scene
 
         if(minGoodCubeFallDistance <= maxBadCubeFallDistance)
         {
-            moveContainsError = true;
+            moveHasMilimetricError = true;
         }
 
         foreach (Coroutine c in allCoroutinesToWait)
@@ -692,7 +678,7 @@ public class Scene
             sceneStatus = SceneStatus.Idle;
         }
 
-        moveContainsError = false;
+        moveHasMilimetricError = false;
     }
 
     public IEnumerator UndoCoroutine()
@@ -877,7 +863,7 @@ public class Scene
                 backgroundImage.sprite = Prefabs.playScreens[screenIndex];
             }
 
-            if (moveContainsError == false)
+            if (moveHasMilimetricError == false)
             {
                 bool andBadCubeLeft = false;
                 foreach (Cube c in dynamicCubes)
@@ -892,10 +878,6 @@ public class Scene
                     StaticCoroutine.StopAllCoroutines();
                     StaticCoroutine.StartCoroutine(WinLevel());
                 }
-//                 else if (gameManager != null)
-//                 {
-//                     StaticCoroutine.StartCoroutine(CreateTick(cubeLastPosition));
-//                 }
             }
         }
     }
@@ -992,6 +974,8 @@ public class Scene
 
             cubes[x, y] = newCube;
             cubeIndex++;
+
+            // Check if prism is required on edge
             if(newCube.GetCubeType() == CubeType.Gray)
             {
                 if (x == 0)
@@ -1006,7 +990,6 @@ public class Scene
                 {
                     GameObject prism = GameObject.Instantiate(Prefabs.prism);
                     prism.transform.position = new Vector3(x, 0, -1);
-
                     prism.transform.parent = levelRootObject.transform;
                 }
                 if (x == levelWidth - 1)
@@ -1049,7 +1032,7 @@ public class Scene
         {
             float t = Curve.Instance.LevelLoadScale.Evaluate(currentTime / totalTime);
 
-            levelRootObject.transform.localScale = Vector3.Lerp(/*levelRootObject.transform.localScale*/ load ? Vector3.zero : Vector3.one, load ? Vector3.one : Vector3.zero, t);
+            levelRootObject.transform.localScale = Vector3.Lerp(load ? Vector3.zero : Vector3.one, load ? Vector3.one : Vector3.zero, t);
             yield return new WaitForEndOfFrame();
             currentTime = currentTime + Time.deltaTime;
         }

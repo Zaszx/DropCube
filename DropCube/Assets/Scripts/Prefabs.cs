@@ -35,44 +35,16 @@ public static class Prefabs
 
         tickObject = Resources.Load<GameObject>("Prefabs/UI/TickIcon");
 
-        if (IsTablet())
-        {
-            playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen");
-            playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen_2");
-            playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/play-screen_3");
+        playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/play-screen");
+        playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/play-screen_2");
+        playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/play-screen_3");
 
-            failScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/fail-screen");
+        failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
 
-            initialScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/start-screen");
+        initialScreen = Resources.Load<Sprite>("Images/backgrounds/start-screen");
 
-            clearScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/clear-screen");
-            levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/ipadSizes/levelselect-screen");
-        }
-        else
-        {
-            playScreens[0] = Resources.Load<Sprite>("Images/backgrounds/play-screen");
-            playScreens[1] = Resources.Load<Sprite>("Images/backgrounds/play-screen_2");
-            playScreens[2] = Resources.Load<Sprite>("Images/backgrounds/play-screen_3");
-
-            failScreen = Resources.Load<Sprite>("Images/backgrounds/fail-screen");
-
-            initialScreen = Resources.Load<Sprite>("Images/backgrounds/start-screen");
-
-            clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
-            levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/levelselect-screen");
-        }
-    }
-
-    private static bool IsTablet()
-    {
-        float screenWidth = Screen.width / Screen.dpi;
-        float screenHeight = Screen.height / Screen.dpi;
-        float ratio = screenWidth / screenHeight;
-        if(screenWidth / screenHeight > 0.65f)
-        {
-            return true;
-        }
-        return false;
+        clearScreen = Resources.Load<Sprite>("Images/backgrounds/clear-screen");
+        levelSelectScreen = Resources.Load<Sprite>("Images/backgrounds/levelselect-screen");
     }
 
     public static GameObject GetCubePrefabWithType(CubeType type)
