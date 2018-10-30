@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Advertisements;
 
 public enum GameState
 {
@@ -123,6 +124,7 @@ public class GameManager : MonoBehaviour
 
         pressAndHoldText.gameObject.SetActive(false);
 
+        Advertisement.Initialize("1653772");
         //scene.ReadLevel("Assets/Resources/Levels/testLevel.xml", false);
     }
 
@@ -149,6 +151,9 @@ public class GameManager : MonoBehaviour
         scene.ReadLevel(levels[openLevelIndex], "", false);
         gameState = GameState.Game;
         swipeData.Reset();
+
+        bool isReady = Advertisement.IsReady();
+        Advertisement.Show();
     }
 
     public void UndoButtonDown()

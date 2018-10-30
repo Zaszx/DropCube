@@ -57,18 +57,11 @@ public class MenuManager
         }
 
         this.maxOpenLevel = maxOpenLevel;
-
-        //buttonsParent.transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
     }
 
     public void Tick()
     {
-//         foreach (KeyValuePair<Button, Level> pair in buttonToLevelMap)
-//         {
-//             pair.Key.GetComponent<RectTransform>().position = Vector3.one;
-// 
-//             pair.Key.GetComponent<RectTransform>().localPosition = Vector3.zero;
-//         }
+
     }
 
     public void UnlockLevel(int index)
@@ -97,21 +90,7 @@ public class MenuManager
         foreach(KeyValuePair<Button, int> pair in buttonToLevelIndexMap)
         {
             pair.Key.GetComponent<RectTransform>().position = Vector3.one;
-
             pair.Key.GetComponent<RectTransform>().localPosition = Vector3.zero;
-
-//             if (pair.Value > gameManager.saveData.level)
-//             {
-//                 Color color = pair.Key.GetComponent<Image>().color;
-//                 color.a = 0.3f;
-//                 pair.Key.GetComponent<Image>().color = color;
-//             }
-//             else
-//             {
-//                 Color color = pair.Key.GetComponent<Image>().color;
-//                 color.a = 1.0f;
-//                 pair.Key.GetComponent<Image>().color = color;
-//             }
         }
     }
 }
