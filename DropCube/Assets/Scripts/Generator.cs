@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Unity.TextMeshPro;
 
 public class Generator : MonoBehaviour 
 {
     public Scene scene;
     public Slider complexitySlider;
-    public Text solutionText;
+    public TMP_Text solutionText;
     public InputField sceneNameField;
 
 	void Start () 

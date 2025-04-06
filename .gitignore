@@ -3,5 +3,7 @@
 /DropCube/*.csproj
 /DropCube/*.sln
 /DropCube/.vs
+/DropCube/Logs
+/DropCube/UserSettings
 *.suo
 *.cache
